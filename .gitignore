@@ -1,0 +1,60 @@
+# Entorno virtual
+entorno-virtual/
+
+# Archivos de base de datos locales
+*.db
+*.sqlite3
+*.sqlite
+
+# Archivos compilados de Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Archivos de configuración local (si usas uno separado para settings sensibles)
+local_settings.py
+.env  # Si usas variables de entorno en un archivo .env
+
+# Archivos de logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.bak
+*.swp
+
+# Archivos generados por el sistema operativo
+.DS_Store  # macOS
+Thumbs.db  # Windows
+*.DS_Store
+
+# Archivos de Django específicos
+db.sqlite3  # Si alguna vez usas SQLite
+media/  # Carpeta de archivos subidos (si la usas)
+staticfiles/  # Carpeta de archivos estáticos recolectados
+
+# Carpetas de dependencias (si usas npm o similares en el futuro)
+node_modules/
+
+# Archivos de IDE/editor (descomentar según tu entorno)
+#.idea/  # PyCharm
+#.vscode/  # Visual Studio Code
+*.sublime-project
+*.sublime-workspace
+
+# Archivos de cobertura y pruebas
+htmlcov/
+.coverage
+.tox/
+
+# Archivos de paquetes y distribución
+*.egg-info/
+build/
+dist/
+
+# Otros
+*.pyc
+*.pyo
+*.pyd
+*.so
