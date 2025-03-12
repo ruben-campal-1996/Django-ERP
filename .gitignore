@@ -1,6 +1,8 @@
 # Entorno virtual
 entorno-virtual/
 
+#Draw.io
+.drawio
 # Archivos de base de datos locales
 *.db
 *.sqlite3
