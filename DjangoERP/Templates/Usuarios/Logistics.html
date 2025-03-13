@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logistics - Inicio</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{% url 'login' %}">Iniciar Sesión</a>
+    </div>
+    <div class="container">
+        <h1>Bienvenido a Logistics</h1>
+        <p>Esta es la página principal de nuestro sistema ERP.</p>
+    </div>
+</body>
+</html>

@@ -6,6 +6,7 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=200)  # VARCHAR(200)
     precio = models.DecimalField(max_digits=10, decimal_places=2)  # Número con 2 decimales
     stock = models.PositiveIntegerField()  # Número entero positivo
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)  # Campo opcional para imágenes
 
     def save(self, *args, **kwargs):
         # Generamos un ID aleatorio de 5 cifras si no existe

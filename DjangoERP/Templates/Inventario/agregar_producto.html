@@ -1,0 +1,14 @@
+{% extends 'Inventario/Inventario.html' %}
+
+{% block title %}Agregar Producto{% endblock %}
+
+{% block header %}Agregar Nuevo Producto{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'inventario' %}">Volver a Inventario</a>
+{% endblock %}

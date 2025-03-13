@@ -2,6 +2,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from .models import Usuario
+from Inventario.models import Producto
 
 class UsuarioCreationForm(UserCreationForm):
     class Meta:
@@ -34,6 +35,11 @@ class UsuarioChangeForm(UserChangeForm):
             'is_staff': 'Acceso al admin',
             'is_superuser': 'Superusuario',
         }
+
+class ProductoForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = ['nombre', 'precio', 'stock', 'imagen']  # Todos los campos editables
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
