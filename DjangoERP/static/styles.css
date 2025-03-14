@@ -1,0 +1,66 @@
+/* styles.css */
+
+/* Banda superior */
+.top-bar {
+    background-color: #000;
+    width: 100%;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center; /* Centra los elementos horizontalmente */
+    align-items: center; /* Alinea verticalmente al centro */
+}
+
+/* Estilo para el nombre del usuario */
+.username {
+    color: #fff;
+    padding: 10px 20px;
+    background-color: #333;
+    border-radius: 4px;
+    margin-right: 10px; /* Espacio entre el nombre y el botón */
+}
+
+/* Estilos para los botones */
+.btn {
+    padding: 10px 20px;
+    margin-left: 10px; /* Espacio entre botones */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    color: #fff;
+}
+
+.btn-primary {
+    background-color: #007bff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+.btn-secondary {
+    background-color: #dc3545; /* Rojo para indicar alerta */
+}
+
+.btn-secondary:hover {
+    background-color: #c82333; /* Rojo más oscuro en hover */
+}
+
+/* Estilo general para el cuerpo */
+body {
+    margin: 0;
+    padding-top: 60px;
+    font-family: Arial, sans-serif;
+}
+
+/* Contenedor principal */
+.container {
+    width: 50%;
+    margin: 50px auto;
+    text-align: center;
+}

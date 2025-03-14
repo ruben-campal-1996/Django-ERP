@@ -109,6 +109,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Usa la base de datos para sesiones
+SESSION_COOKIE_SECURE = False  # False para desarrollo local (http)
+CSRF_COOKIE_SECURE = False    # False para desarrollo local (http)
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -127,6 +131,8 @@ USE_TZ = True
 STATIC_URL = '/static/'              # URL para acceder a los archivos estáticos
 STATICFILES_DIRS = [BASE_DIR / 'static']  # Directorios adicionales donde Django busca archivos estáticos
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+LOGIN_URL = '/usuarios/login/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

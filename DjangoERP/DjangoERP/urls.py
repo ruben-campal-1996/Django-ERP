@@ -18,11 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.shortcuts import redirect  # Importamos redirect
+from django.shortcuts import redirect
+from Usuarios.views import logistics_view  # Importamos logistics_view directamente
 
 urlpatterns = [
-    path('', lambda request: redirect('usuarios/'), name='home'),  # Ahora redirect está definido
+    path('', lambda request: redirect('Logistics/'), name='home'),  # Redirige raíz a /Logistics/
+    path('Logistics/', logistics_view, name='logistics'),  # Nueva ruta para logistics_view
     path('admin/', admin.site.urls),
     path('usuarios/', include('Usuarios.urls', namespace='usuarios')),
-    path('inventario/', include('Inventario.urls')),
+    path('inventario/', include('Inventario.urls', namespace='inventario')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,7 +1,7 @@
+# Usuarios/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser, UserManager
 
-# Administrador de usuarios personalizado
 class CustomUserManager(UserManager):
     def _create_user(self, correo, password, **extra_fields):
         if not correo:
@@ -20,15 +20,12 @@ class CustomUserManager(UserManager):
     def create_superuser(self, correo, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        
         if extra_fields.get('is_staff') is not True:
             raise ValueError('El superusuario debe tener is_staff=True')
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('El superusuario debe tener is_superuser=True')
-        
         return self._create_user(correo, password, **extra_fields)
 
-# Modelo de usuario personalizado
 class Usuario(AbstractUser):
     ROL_CHOICES = [
         ('Administrador', 'Administrador'),
@@ -44,9 +41,6 @@ class Usuario(AbstractUser):
     correo = models.EmailField(max_length=200, unique=True)
     rol = models.CharField(max_length=30, choices=ROL_CHOICES, default='Cliente')
     
-    username = models.CharField(max_length=150, unique=True, blank=True, null=True)
-    
-    # Asignamos el administrador personalizado
     objects = CustomUserManager()
     
     USERNAME_FIELD = 'correo'
