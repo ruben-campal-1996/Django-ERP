@@ -10,8 +10,8 @@
 <body>
     <div class="top-bar">
         {% if user.is_authenticated %}
-            <span class="username">{{ user.nombre }}</span>
             <a href="{% url 'usuarios:logout' %}" class="btn btn-secondary">Cerrar Sesión</a>
+            <span class="username">{{ user.nombre }}</span>
         {% else %}
             <a href="{% url 'usuarios:login' %}" class="btn btn-primary">Iniciar Sesión</a>
             <a href="{% url 'usuarios:register' %}" class="btn btn-secondary">Registrarse</a>
