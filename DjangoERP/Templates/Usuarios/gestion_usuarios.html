@@ -20,7 +20,7 @@
         {% endif %}
 
         <!-- Botón para abrir el modal de creación -->
-        <button class="btn btn-primary" onclick="document.getElementById('createModal').style.display='block'">Crear Nuevo Usuario</button>
+        <button class="btn btn-primary" onclick="document.getElementById('createModal').classList.add('active')">Crear Nuevo Usuario</button>
 
         <!-- Tabla de usuarios -->
         <div class="table-container">
@@ -41,6 +41,7 @@
                             <td>{{ usuario.rol }}</td>
                             <td>
                                 <button class="btn btn-primary" onclick="openEditModal('{{ usuario.id_usuario }}', '{{ usuario.nombre }}', '{{ usuario.correo }}', '{{ usuario.rol }}')">Editar</button>
+                                <button class="btn btn-secondary" onclick="deleteUser('{{ usuario.id_usuario }}')">Eliminar</button>
                             </td>
                         </tr>
                     {% empty %}
@@ -55,7 +56,7 @@
         <!-- Modal para crear usuario -->
         <div id="createModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="document.getElementById('createModal').style.display='none'">×</span>
+                <span class="close" onclick="document.getElementById('createModal').classList.remove('active')">×</span>
                 <h2>Crear Nuevo Usuario</h2>
                 <form method="post" action="{% url 'usuarios:gestion_usuarios' %}">
                     {% csrf_token %}
@@ -77,7 +78,7 @@
         <!-- Modal para editar usuario -->
         <div id="editModal" class="modal">
             <div class="modal-content">
-                <span class="close" onclick="document.getElementById('editModal').style.display='none'">×</span>
+                <span class="close" onclick="document.getElementById('editModal').classList.remove('active')">×</span>
                 <h2>Editar Usuario</h2>
                 <form method="post" action="{% url 'usuarios:gestion_usuarios' %}" id="editForm">
                     {% csrf_token %}
@@ -112,17 +113,46 @@
             </div>
         </div>
 
-    <script>
-        function openEditModal(userId, nombre, correo, rol) {
-            var modal = document.getElementById('editModal');
-            document.getElementById('editUserId').value = userId;
-            document.getElementById('editNombre').value = nombre;
-            document.getElementById('editCorreo').value = correo;
-            document.getElementById('rol_edit').value = rol;
-            document.getElementById('editPassword1').value = '';
-            document.getElementById('editPassword2').value = '';
-            modal.style.display = 'block';
-        }
-    </script>
+        <script>
+            function openEditModal(userId, nombre, correo, rol) {
+                var modal = document.getElementById('editModal');
+                document.getElementById('editUserId').value = userId;
+                document.getElementById('editNombre').value = nombre;
+                document.getElementById('editCorreo').value = correo;
+                document.getElementById('rol_edit').value = rol;
+                document.getElementById('editPassword1').value = '';
+                document.getElementById('editPassword2').value = '';
+                modal.classList.add('active');
+            }
+        
+            function deleteUser(userId) {
+                if (confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+                    var form = document.createElement('form');
+                    form.method = 'post';
+                    form.action = "{% url 'usuarios:gestion_usuarios' %}";
+                    
+                    var csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrfmiddlewaretoken';
+                    csrfInput.value = '{{ csrf_token }}';
+                    form.appendChild(csrfInput);
+                    
+                    var actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action';
+                    actionInput.value = 'delete';
+                    form.appendChild(actionInput);
+                    
+                    var idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'user_id';
+                    idInput.value = userId;
+                    form.appendChild(idInput);
+                    
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        </script>
 </body>
 </html>

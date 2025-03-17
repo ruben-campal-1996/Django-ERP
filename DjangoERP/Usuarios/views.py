@@ -73,49 +73,48 @@ def logout_view(request):
 
 @login_required
 def gestion_usuarios(request):
-    if not is_admin(request.user):
-        messages.error(request, "No tienes permiso para acceder a esta página.")
-        return redirect('logistics')
-
-    usuarios = Usuario.objects.filter(is_superuser=False)
+    usuarios = Usuario.objects.all()
     create_form = UsuarioCreationForm()
-    edit_form = UsuarioCreationForm()
+    roles = Usuario._meta.get_field('rol').choices
 
     if request.method == 'POST':
         action = request.POST.get('action')
-
+        
         if action == 'create':
             form = UsuarioCreationForm(request.POST)
-            rol = request.POST.get('rol')
-            if form.is_valid() and rol in dict(Usuario.ROL_CHOICES):
-                user = form.save(commit=False)
-                user.rol = rol
-                user.save()
-                messages.success(request, f"Usuario {user.nombre} creado con éxito.")
-                return redirect('usuarios:gestion_usuarios')
-
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Usuario creado exitosamente.')
+            else:
+                messages.error(request, 'Error al crear el usuario.')
+            return redirect('usuarios:gestion_usuarios')
+        
         elif action == 'edit':
+            user_id = request.POST.get('user_id')
+            usuario = Usuario.objects.get(id_usuario=user_id)
+            usuario.nombre = request.POST.get('nombre')
+            usuario.correo = request.POST.get('correo')
+            usuario.rol = request.POST.get('rol')
+            if request.POST.get('password1'):
+                usuario.set_password(request.POST.get('password1'))
+            usuario.save()
+            messages.success(request, 'Usuario actualizado exitosamente.')
+            return redirect('usuarios:gestion_usuarios')
+        
+        elif action == 'delete':
             user_id = request.POST.get('user_id')
             try:
                 usuario = Usuario.objects.get(id_usuario=user_id)
-                form = UsuarioCreationForm(request.POST, instance=usuario)
-                rol = request.POST.get('rol')
-                if form.is_valid() and rol in dict(Usuario.ROL_CHOICES):
-                    user = form.save(commit=False)
-                    if 'password1' in form.cleaned_data and form.cleaned_data['password1']:
-                        user.set_password(form.cleaned_data['password1'])
-                    user.rol = rol
-                    user.save()
-                    messages.success(request, f"Usuario {user.nombre} actualizado con éxito.")
-                    return redirect('usuarios:gestion_usuarios')
+                usuario.delete()
+                messages.success(request, 'Usuario eliminado exitosamente.')
             except Usuario.DoesNotExist:
-                messages.error(request, "Usuario no encontrado.")
+                messages.error(request, 'El usuario no existe.')
+            return redirect('usuarios:gestion_usuarios')
 
     return render(request, 'usuarios/gestion_usuarios.html', {
         'usuarios': usuarios,
         'create_form': create_form,
-        'edit_form': edit_form,
-        'roles': Usuario.ROL_CHOICES
+        'roles': roles,
     })
 
 @login_required

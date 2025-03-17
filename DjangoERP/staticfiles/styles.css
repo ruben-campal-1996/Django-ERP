@@ -108,13 +108,13 @@ body {
 .user-table {
     width: 100%;
     border-collapse: collapse;
-    background-color: red; /* Cambio temporal para verificar */
+    background-color: rgb(213, 213, 213); /* Cambio temporal para verificar */
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     border-radius: 4px;
     overflow: hidden;
 }
 
-.user-table th, .user-table td {
+.user-table th, .user-table td {    
     padding: 15px;
     text-align: left;
     border-bottom: 1px solid #b3b3b3;
@@ -124,7 +124,7 @@ body {
     background-color: #949494;
     color: #333;
     font-weight: bold;
-    text-transform: uppercase;
+    text-transform: uppercase;          
     font-size: 14px;
 }
 
@@ -139,7 +139,7 @@ body {
 
 /* Modal */
 .modal {
-    display: none;
+    display: none; /* Estado inicial: oculto */
     position: fixed;
     z-index: 1002;
     left: 0;
@@ -149,14 +149,21 @@ body {
     background-color: rgba(0,0,0,0.5);
 }
 
+/* Cuando se muestra, usamos flex para centrar */
+.modal.active {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .modal-content {
     background-color: #fff;
-    margin: 15% auto;
     padding: 20px;
     border-radius: 4px;
     width: 80%;
     max-width: 500px;
     position: relative;
+    text-align: center; /* Centramos el texto general dentro del modal */
 }
 
 .close {
@@ -166,6 +173,7 @@ body {
     font-size: 24px;
     cursor: pointer;
     color: #333;
+    z-index: 10; /* Asegura que esté encima de otros elementos */
 }
 
 .close:hover {
@@ -175,8 +183,9 @@ body {
 /* Estilos para el formulario */
 .form-group {
     margin-bottom: 20px;
-    text-align: left;
-    max-width: 400px;
+    text-align: left; /* Mantenemos los labels alineados a la izquierda */
+    width: 100%; /* Aseguramos que ocupe todo el ancho disponible */
+    max-width: 400px; /* Límite para los campos */
     margin-left: auto;
     margin-right: auto;
 }
