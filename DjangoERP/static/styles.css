@@ -4,25 +4,56 @@
 .top-bar {
     background-color: #000;
     width: 100%;
-    padding: 10px 20px 10px 20px; /* Mantiene padding superior e inferior, izquierdo original */
-    padding-right: 30px; /* Añade margen a la derecha para no pegarse al borde */
+    padding: 10px 20px 10px 20px;
+    padding-right: 30px;
     position: fixed;
     top: 0;
     left: 0;
     z-index: 1000;
     display: flex;
-    justify-content: flex-end; /* Alinea todo a la derecha */
+    justify-content: flex-end;
     align-items: center;
-    gap: 15px; /* Espacio uniforme entre elementos (botones y nombre) */
+    gap: 15px;
 }
 
-/* Estilo para el nombre del usuario */
+/* Estilo para el nombre del usuario (botón) */
 .username {
     color: #fff;
     padding: 10px 20px;
     background-color: #333;
     border-radius: 4px;
-    margin-right: 40px;
+    border: none;
+    cursor: pointer;
+}
+
+/* Contenedor del desplegable */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Contenido del desplegable */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #333;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1001;
+    border-radius: 4px;
+}
+
+.dropdown-content a {
+    color: #fff;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #555;
 }
 
 /* Estilos para los botones */
@@ -46,7 +77,7 @@
 
 .btn-secondary {
     background-color: #dc3545;
-    margin-right: 40px;
+    margin-right: 20px;
 }
 
 .btn-secondary:hover {
@@ -62,12 +93,86 @@ body {
 
 /* Contenedor principal */
 .container {
-    width: 50%;
+    width: 80%; /* Ampliado para la tabla */
     margin: 50px auto;
     text-align: center;
 }
 
-/* Estilos para el formulario (Login.html) */
+/* Contenedor de la tabla */
+.table-container {
+    margin-top: 20px;
+    overflow-x: auto; /* Para tablas grandes en pantallas pequeñas */
+}
+
+/* Estilo de la tabla */
+.user-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: red; /* Cambio temporal para verificar */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.user-table th, .user-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #b3b3b3;
+}
+
+.user-table th {
+    background-color: #949494;
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.user-table td {
+    color: #555;
+    font-size: 14px;
+}
+
+.user-table tr:hover {
+    background-color: #f1f3f5; /* Efecto hover */
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 4px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+}
+
+.close:hover {
+    color: #000;
+}
+
+/* Estilos para el formulario */
 .form-group {
     margin-bottom: 20px;
     text-align: left;

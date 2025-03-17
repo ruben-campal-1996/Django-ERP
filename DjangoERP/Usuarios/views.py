@@ -9,8 +9,10 @@ from .models import Usuario
 
 User = get_user_model()  # Esto usa Usuarios.Usuario en lugar de django.contrib.auth.models.User
 
-def logistics_view(request):
+def is_admin(user):
+    return user.is_authenticated and user.rol == 'Administrador'
 
+def logistics_view(request):
     return render(request, 'Usuarios/Logistics.html')
 
 def index(request):
@@ -67,6 +69,54 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('logistics')
+
+
+@login_required
+def gestion_usuarios(request):
+    if not is_admin(request.user):
+        messages.error(request, "No tienes permiso para acceder a esta página.")
+        return redirect('logistics')
+
+    usuarios = Usuario.objects.filter(is_superuser=False)
+    create_form = UsuarioCreationForm()
+    edit_form = UsuarioCreationForm()
+
+    if request.method == 'POST':
+        action = request.POST.get('action')
+
+        if action == 'create':
+            form = UsuarioCreationForm(request.POST)
+            rol = request.POST.get('rol')
+            if form.is_valid() and rol in dict(Usuario.ROL_CHOICES):
+                user = form.save(commit=False)
+                user.rol = rol
+                user.save()
+                messages.success(request, f"Usuario {user.nombre} creado con éxito.")
+                return redirect('usuarios:gestion_usuarios')
+
+        elif action == 'edit':
+            user_id = request.POST.get('user_id')
+            try:
+                usuario = Usuario.objects.get(id_usuario=user_id)
+                form = UsuarioCreationForm(request.POST, instance=usuario)
+                rol = request.POST.get('rol')
+                if form.is_valid() and rol in dict(Usuario.ROL_CHOICES):
+                    user = form.save(commit=False)
+                    if 'password1' in form.cleaned_data and form.cleaned_data['password1']:
+                        user.set_password(form.cleaned_data['password1'])
+                    user.rol = rol
+                    user.save()
+                    messages.success(request, f"Usuario {user.nombre} actualizado con éxito.")
+                    return redirect('usuarios:gestion_usuarios')
+            except Usuario.DoesNotExist:
+                messages.error(request, "Usuario no encontrado.")
+
+    return render(request, 'usuarios/gestion_usuarios.html', {
+        'usuarios': usuarios,
+        'create_form': create_form,
+        'edit_form': edit_form,
+        'roles': Usuario.ROL_CHOICES
+    })
 
 @login_required
 def admin_create_user(request):
