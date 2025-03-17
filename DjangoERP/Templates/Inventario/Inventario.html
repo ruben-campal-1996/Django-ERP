@@ -1,56 +1,109 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Inventario{% endblock %}</title>
-    <style>
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin: 20px auto;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Inventario</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
-    <h1>{% block header %}Lista de Productos{% endblock %}</h1>
-    {% block content %}
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Precio</th>
-                <th>Stock</th>
-                <th>Imagen</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for producto in productos %}
-            <tr>
-                <td>{{ producto.id_producto }}</td>
-                <td>{{ producto.nombre }}</td>
-                <td>{{ producto.precio }}</td>
-                <td>{{ producto.stock }}</td>
-                <td>
-                    {% if producto.imagen %}
-                    <a href="{{ producto.imagen.url }}" target="_blank">Ver imagen</a>
-                    {% else %}
-                    Sin imagen
-                    {% endif %}
-                </td>
-            </tr>
+    <div class="top-bar">
+        <a href="{% url 'logistics' %}" class="btn btn-secondary">Volver</a>
+    </div>
+    <div class="container">
+        <h1>Gestión de Inventario</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
             {% endfor %}
-        </tbody>
-    </table>
-    <a href="{% url 'agregar_producto' %}">Agregar nuevo producto</a>
-    {% endblock %}
+        {% endif %}
+
+        <!-- Botón para abrir el modal -->
+        <button class="btn btn-primary" onclick="document.getElementById('addModal').classList.add('active')">Añadir Producto</button>
+
+        <!-- Tabla de productos -->
+        <div class="table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
+                        <th>Imagen</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                        <tr>
+                            <td>{{ producto.id_producto }}</td>
+                            <td>{{ producto.nombre }}</td>
+                            <td>{{ producto.descripcion|default:'Sin descripción' }}</td>
+                            <td>{{ producto.precio }}</td>
+                            <td>{{ producto.stock }}</td>
+                            <td>
+                                {% if producto.imagen %}
+                                    <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" style="max-width: 100px;">
+                                {% else %}
+                                    Sin imagen
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-secondary" onclick="deleteProduct('{{ producto.id_producto }}')">Eliminar</button>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7">No hay productos en el inventario.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Modal para añadir producto -->
+        <div id="addModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="document.getElementById('addModal').classList.remove('active')">×</span>
+                <h2>Añadir Producto</h2>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function deleteProduct(productId) {
+            if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
+                var form = document.createElement('form');
+                form.method = 'post';
+                form.action = "{% url 'inventario:inventario' %}";
+                var csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = '{{ csrf_token }}';
+                form.appendChild(csrfInput);
+                var actionInput = document.createElement('input');
+                actionInput.type = 'hidden';
+                actionInput.name = 'action';
+                actionInput.value = 'delete';
+                form.appendChild(actionInput);
+                var idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'product_id';
+                idInput.value = productId;
+                form.appendChild(idInput);
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
 </body>
 </html>
