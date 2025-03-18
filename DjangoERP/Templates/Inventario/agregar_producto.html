@@ -1,14 +1,23 @@
-{% extends 'Inventario/Inventario.html' %}
-
-{% block title %}Agregar Producto{% endblock %}
-
-{% block header %}Agregar Nuevo Producto{% endblock %}
-
-{% block content %}
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Guardar</button>
-</form>
-<a href="{% url 'inventario' %}">Volver a Inventario</a>
-{% endblock %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Añadir Producto</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{% url 'inventario:inventario' %}" class="btn btn-secondary">Volver</a>
+    </div>
+    <div class="container">
+        <h1>Añadir Producto</h1>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary">Guardar</button>
+        </form>
+    </div>
+</body>
+</html>

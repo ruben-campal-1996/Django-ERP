@@ -26,5 +26,5 @@ urlpatterns = [
     path('Logistics/', logistics_view, name='logistics'),  # Nueva ruta para logistics_view
     path('admin/', admin.site.urls),
     path('usuarios/', include('Usuarios.urls', namespace='usuarios')),
-    path('inventario/', include('Inventario.urls', namespace='inventario')),
+    path('Logistics/inventario/', include('Inventario.urls', namespace='inventario')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

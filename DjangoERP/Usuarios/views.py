@@ -22,9 +22,17 @@ def register_view(request):
     if request.method == 'POST':
         form = UsuarioCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            # Guardar el usuario
+            user = form.save(commit=False)  # No guardar directamente aún
+            user.rol = 'Cliente'  # Forzar el rol 'Cliente' por si acaso
+            user.save()  # Guardar en la base de datos
+            print(f"Usuario guardado: {user.correo} con rol {user.rol}")  # Depuración
             messages.success(request, 'Cuenta creada con éxito. ¡Ya puedes iniciar sesión!')
             return redirect('usuarios:login')
+        else:
+            # Mostrar errores del formulario
+            print("Errores del formulario:", form.errors)  # Depuración en consola
+            messages.error(request, 'Error al registrar el usuario. Revisa los campos.')
     else:
         form = UsuarioCreationForm()
     return render(request, 'Usuarios/register.html', {'form': form})

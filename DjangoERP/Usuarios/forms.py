@@ -7,11 +7,10 @@ from Inventario.models import Producto
 class UsuarioCreationForm(UserCreationForm):
     class Meta:
         model = Usuario
-        fields = ('nombre', 'correo', 'rol', 'password1', 'password2')
+        fields = ('nombre', 'correo', 'password1', 'password2')  # Excluimos 'rol'
         labels = {
             'nombre': 'Nombre completo',
             'correo': 'Correo electrónico',
-            'rol': 'Rol del usuario',
         }
         help_texts = {
             'correo': 'Este será el campo para iniciar sesión.',
@@ -19,7 +18,6 @@ class UsuarioCreationForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Eliminamos el campo username si no lo usamos
         if 'username' in self.fields:
             del self.fields['username']
 

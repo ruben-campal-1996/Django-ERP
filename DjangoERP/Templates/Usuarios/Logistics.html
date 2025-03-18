@@ -30,7 +30,7 @@
         {% if user.is_authenticated and user.rol == 'Administrador' %}
             <a href="{% url 'usuarios:gestion_usuarios' %}" class="btn btn-primary">Gestión de usuarios</a>
         {% endif %}
-        {% if user.usuario.rol == 'Encargado de inventario' %}
+        {% if user.is_authenticated and user.rol == 'Encargado de inventario' %}
             <a href="{% url 'inventario:inventario' %}" class="btn btn-primary">Gestión de Inventario</a>
         {% endif %}
     </div>

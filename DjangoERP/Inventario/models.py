@@ -1,4 +1,6 @@
+# Inventario/models.py
 from django.db import models
+from django.conf import settings
 import random
 
 class Producto(models.Model):
@@ -10,7 +12,6 @@ class Producto(models.Model):
     imagen = models.ImageField(upload_to='productos/', blank=True, null=True)  # Campo opcional para imágenes
 
     def save(self, *args, **kwargs):
-        # Generamos un ID aleatorio de 5 cifras si no existe
         if not self.id_producto:
             while True:
                 new_id = str(random.randint(10000, 99999))
@@ -21,3 +22,22 @@ class Producto(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class MovimientoStock(models.Model):
+    TIPO_MOVIMIENTO = (
+        ('entrada', 'Entrada'),
+        ('salida', 'Salida'),
+    )
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    tipo = models.CharField(max_length=10, choices=TIPO_MOVIMIENTO)
+    cantidad = models.PositiveIntegerField()
+    fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.tipo} de {self.cantidad} unidades de {self.producto.nombre} el {self.fecha}"

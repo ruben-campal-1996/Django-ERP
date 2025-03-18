@@ -1,0 +1,52 @@
+{% extends 'Inventario/Inventario.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Recibir Stock</h1>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_stock">
+        <!-- Selección de productos -->
+        <label for="product-select">Seleccionar productos:</label>
+        <select id="product-select" name="productos[]" multiple="multiple" style="width: 100%;"></select>
+        <!-- Contenedor para cantidades -->
+        <div id="selected-products"></div>
+        <button type="submit" class="btn btn-primary">Confirmar Recepción</button>
+    </form>
+</div>
+
+<!-- Select2 y lógica de búsqueda -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#product-select').select2({
+        placeholder: "Buscar y seleccionar productos",
+        ajax: {
+            url: "{% url 'inventario:buscar_productos' %}",
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return { term: params.term || '' };
+            },
+            processResults: function(data) {
+                return { results: data };
+            },
+            cache: true
+        },
+        minimumInputLength: 1
+    });
+
+    // Añadir campo de cantidad al seleccionar un producto
+    $('#product-select').on('select2:select', function(e) {
+        var data = e.params.data;
+        var div = `<div class="form-group" id="prod-${data.id}">
+            <label>${data.text}</label>
+            <input type="number" name="cantidades[${data.id}]" min="1" class="form-control" placeholder="Cantidad" required>
+            <button type="button" onclick="$('#prod-${data.id}').remove(); $('#product-select').val(null).trigger('change');">Eliminar</button>
+        </div>`;
+        $('#selected-products').append(div);
+    });
+});
+</script>
+{% endblock %}
