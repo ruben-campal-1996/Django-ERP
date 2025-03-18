@@ -23,7 +23,7 @@
 
         <!-- Botones -->
         <button class="btn btn-primary" onclick="document.getElementById('addModal').classList.add('active')">Añadir Producto</button>
-        <button class="btn btn-primary" onclick="document.getElementById('pedidoModal').classList.add('active')">Pedido</button>
+        <a href="{% url 'inventario:pedidos' %}" class="btn btn-primary">Pedidos</a>
         <button class="btn btn-primary" onclick="document.getElementById('stockModal').classList.add('active')">Recibir Stock</button>
         <a href="{% url 'inventario:descargar_registro' %}" class="btn btn-primary">Registro de Movimientos</a>
         <a href="{% url 'inventario:descargar_inventario' %}" class="btn btn-primary">Registro de Inventario</a>

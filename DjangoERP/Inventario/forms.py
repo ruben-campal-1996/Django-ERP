@@ -1,5 +1,5 @@
 from django import forms
-from .models import Producto
+from .models import Producto, Pedido
 
 class ProductoForm(forms.ModelForm):
     class Meta:
@@ -8,3 +8,8 @@ class ProductoForm(forms.ModelForm):
         widgets = {
             'descripcion': forms.Textarea(attrs={'rows': 3}),
         }
+
+class PedidoForm(forms.ModelForm):
+    class Meta:
+        model = Pedido
+        fields = ['estado']

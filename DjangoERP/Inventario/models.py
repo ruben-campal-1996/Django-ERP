@@ -1,6 +1,7 @@
 # Inventario/models.py
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 import random
 
 class Producto(models.Model):
@@ -41,3 +42,23 @@ class MovimientoStock(models.Model):
 
     def __str__(self):
         return f"{self.tipo} de {self.cantidad} unidades de {self.producto.nombre} el {self.fecha}"
+
+class Pedido(models.Model):
+    ESTADO_CHOICES = [
+        ('en_proceso', 'En proceso'),
+        ('finalizada', 'Finalizada'),
+    ]
+    id_pedido = models.AutoField(primary_key=True)
+    fecha = models.DateTimeField(auto_now_add=True)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
+
+    def __str__(self):
+        return f"Pedido {self.id_pedido} - {self.estado}"
+
+class DetallePedido(models.Model):
+    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
+    producto = models.ForeignKey('Producto', on_delete=models.CASCADE, related_name='inventario_detalle_pedido')
+    cantidad = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.cantidad} de {self.producto.nombre} en Pedido {self.pedido.id_pedido}"

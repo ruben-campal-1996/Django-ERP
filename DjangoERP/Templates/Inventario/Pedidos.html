@@ -1,0 +1,95 @@
+<!-- Templates/Inventario/Pedidos.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos</title>
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <!-- Banda superior -->
+    <div class="top-bar">
+        <a href="{% url 'inventario:inventario' %}" class="btn btn-secondary">Volver.</a>
+        <div class="dropdown">
+            <button class="username">{{ request.user.nombre }}</button>
+            <div class="dropdown-content">
+                <a href="{% url 'usuarios:logout' %}">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Pedidos</h1>
+        <a href="{% url 'inventario:add_pedido' %}" class="btn btn-primary">Añadir Pedido</a>
+        <div class="table-container">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Productos</th>
+                        <th>Fecha</th>
+                        <th>Precio</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pedidos_con_precio %}
+                    <tr>
+                        <td>{{ item.pedido.id_pedido }}</td>
+                        <td>
+                            {% for detalle in item.pedido.detallepedido_set.all %}
+                                {{ detalle.producto.nombre }} ({{ detalle.cantidad }})<br>
+                            {% endfor %}
+                        </td>
+                        <td>{{ item.pedido.fecha|date:"d/m/Y H:i" }}</td>
+                        <td>${{ item.total_precio|floatformat:2 }}</td>
+                        <td>
+                            <select name="estado" onchange="actualizarEstado({{ item.pedido.id_pedido }}, this.value)">
+                                <option value="en_proceso" {% if item.pedido.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
+                                <option value="finalizada" {% if item.pedido.estado == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                            </select>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">No hay pedidos disponibles.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function actualizarEstado(id_pedido, nuevo_estado) {
+            fetch('{% url "inventario:actualizar_estado_pedido" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({id_pedido: id_pedido, nuevo_estado: nuevo_estado})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('Estado actualizado');
+                    if (nuevo_estado === 'finalizada') {
+                        setTimeout(() => location.reload(), 3000);
+                    }
+                } else {
+                    console.error('Error:', data.message);
+                }
+            });
+        }
+
+        // Script para mostrar/ocultar el desplegable
+        document.querySelector('.username').addEventListener('click', function() {
+            const dropdown = document.querySelector('.dropdown-content');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
+</body>
+</html>
