@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from Usuarios.models import Usuario
 from Usuarios.forms import UsuarioCreationForm
+from Inventario.models import Producto, Pedido, DetallePedido, MovimientoStock
 
 @login_required
 def ventas_view(request):
@@ -29,7 +30,7 @@ def ventas_view(request):
     page_number = request.GET.get('page')
     clientes = paginator.get_page(page_number)
     
-    # Formulario para crear clientes
+    # Formulario para crear clientes y pedidos
     form = UsuarioCreationForm()
     if request.method == 'POST':
         if 'create_cliente' in request.POST:
@@ -84,22 +85,41 @@ def ventas_view(request):
     })
 
 @login_required
-def cliente_detalle_view(request, id_usuario):
-    if request.user.rol != 'Empleado de ventas':
-        return redirect('usuarios:logistics')
-    try:
-        cliente = Usuario.objects.get(id_usuario=id_usuario, rol='Cliente', is_superuser=False)
-        return render(request, 'Ventas/cliente_detalle.html', {'cliente': cliente})
-    except Usuario.DoesNotExist:
-        messages.error(request, 'Cliente no encontrado.')
-        return redirect('ventas:ventas')
-
-@login_required
 def buscar_clientes(request):
     if request.user.rol != 'Empleado de ventas':
         return JsonResponse([], safe=False)
     term = request.GET.get('term', '')
     clientes = Usuario.objects.filter(rol='Cliente', is_superuser=False, nombre__icontains=term)[:10]
     results = [{'id': str(c.id_usuario), 'text': c.nombre} for c in clientes]
-    print(f"Clientes encontrados: {results}")  # Depuración
+    print(f"Clientes encontrados: {results}")
     return JsonResponse(results, safe=False)
+
+@login_required
+def cliente_detalle_json(request):
+    if request.user.rol != 'Empleado de ventas':
+        return JsonResponse({'error': 'Permiso denegado'}, status=403)
+    id_usuario = request.GET.get('id_usuario')
+    try:
+        cliente = Usuario.objects.get(id_usuario=id_usuario, rol='Cliente', is_superuser=False)
+        ultimo_pedido = Pedido.objects.filter(cliente=cliente).order_by('-fecha').first()
+        
+        data = {
+            'id_usuario': cliente.id_usuario,
+            'nombre': cliente.nombre,
+            'correo': cliente.correo,
+            'telefono': cliente.telefono,
+            'ultimo_pedido': None
+        }
+        if ultimo_pedido:
+            productos = ", ".join([f"{detalle.producto.nombre} ({detalle.cantidad})" 
+                                 for detalle in ultimo_pedido.detallepedido_set.all()])
+            data['ultimo_pedido'] = {
+                'id_pedido': ultimo_pedido.id_pedido,
+                'fecha': ultimo_pedido.fecha.strftime('%d/%m/%Y %H:%M'),
+                'descripcion': ultimo_pedido.descripcion,
+                'productos': productos,
+                'estado': ultimo_pedido.estado
+            }
+        return JsonResponse(data)
+    except Usuario.DoesNotExist:
+        return JsonResponse({'error': 'Cliente no encontrado'}, status=404)

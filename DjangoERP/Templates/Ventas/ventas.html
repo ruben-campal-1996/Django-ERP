@@ -56,7 +56,7 @@
                             <td>{{ cliente.correo }}</td>
                             <td>{{ cliente.telefono|default:'Sin teléfono' }}</td>
                             <td>
-                                <a href="{% url 'ventas:cliente_detalle' cliente.id_usuario %}" class="btn btn-primary">Detalles</a>
+                                <button class="btn btn-primary" onclick="mostrarDetalles({{ cliente.id_usuario }})">Detalles</button>
                             </td>
                         </tr>
                     {% empty %}
@@ -159,63 +159,112 @@
                 </form>
             </div>
         </div>
-        
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('#cliente-select').select2({
-                    placeholder: "Seleccionar un cliente",
-                    ajax: {
-                        url: "{% url 'ventas:buscar_clientes' %}",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return { term: params.term || '' };
-                        },
-                        processResults: function(data) {
-                            console.log('Clientes recibidos:', data);
-                            return { results: data };
-                        },
-                        cache: true
+
+        <!-- Modal para detalles del cliente -->
+        <div id="detalleModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="document.getElementById('detalleModal').classList.remove('active')">×</span>
+                <h2>Detalles del Cliente</h2>
+                <div id="detalle-content">
+                    <!-- Los datos se cargarán aquí dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#cliente-select').select2({
+                placeholder: "Seleccionar un cliente",
+                ajax: {
+                    url: "{% url 'ventas:buscar_clientes' %}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { term: params.term || '' };
                     },
-                    minimumInputLength: 1,
-                    allowClear: true
-                });
-        
-                $('#product-select').select2({
-                    placeholder: "Buscar y seleccionar productos",
-                    ajax: {
-                        url: "{% url 'inventario:buscar_productos' %}",
-                        dataType: 'json',
-                        delay: 250,
-                        data: function(params) {
-                            return { term: params.term || '' };
-                        },
-                        processResults: function(data) {
-                            console.log('Productos recibidos:', data);
-                            return { results: data };
-                        },
-                        cache: true
+                    processResults: function(data) {
+                        console.log('Clientes recibidos:', data);
+                        return { results: data };
                     },
-                    minimumInputLength: 1
-                });
-        
-                $('#product-select').on('select2:select', function(e) {
-                    var data = e.params.data;
-                    var div = `<div class="form-group" id="prod-${data.id}">
-                        <label>${data.text}</label>
-                        <input type="number" name="cantidades[${data.id}]" min="1" class="form-control" placeholder="Cantidad" required>
-                        <button type="button" onclick="$('#prod-${data.id}').remove(); $('#product-select').val(null).trigger('change');">Eliminar</button>
-                    </div>`;
-                    $('#selected-products').append(div);
-                });
-        
-                document.querySelector('.username').addEventListener('click', function() {
-                    const dropdown = document.querySelector('.dropdown-content');
-                    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-                });
+                    cache: true
+                },
+                minimumInputLength: 1,
+                allowClear: true
             });
-        </script>
+
+            $('#product-select').select2({
+                placeholder: "Buscar y seleccionar productos",
+                ajax: {
+                    url: "{% url 'inventario:buscar_productos' %}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function(params) {
+                        return { term: params.term || '' };
+                    },
+                    processResults: function(data) {
+                        console.log('Productos recibidos:', data);
+                        return { results: data };
+                    },
+                    cache: true
+                },
+                minimumInputLength: 1
+            });
+
+            $('#product-select').on('select2:select', function(e) {
+                var data = e.params.data;
+                var div = `<div class="form-group" id="prod-${data.id}">
+                    <label>${data.text}</label>
+                    <input type="number" name="cantidades[${data.id}]" min="1" class="form-control" placeholder="Cantidad" required>
+                    <button type="button" onclick="$('#prod-${data.id}').remove(); $('#product-select').val(null).trigger('change');">Eliminar</button>
+                </div>`;
+                $('#selected-products').append(div);
+            });
+
+            document.querySelector('.username').addEventListener('click', function() {
+                const dropdown = document.querySelector('.dropdown-content');
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        function mostrarDetalles(id_usuario) {
+            fetch(`/Logistics/ventas/cliente_detalle_json/?id_usuario=${id_usuario}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let content = `
+                    <p><strong>ID:</strong> ${data.id_usuario}</p>
+                    <p><strong>Nombre:</strong> ${data.nombre}</p>
+                    <p><strong>Correo:</strong> ${data.correo}</p>
+                    <p><strong>Teléfono:</strong> ${data.telefono || 'Sin teléfono'}</p>
+                    <h3>Último Pedido</h3>
+                `;
+                if (data.ultimo_pedido) {
+                    content += `
+                        <p><strong>ID Pedido:</strong> ${data.ultimo_pedido.id_pedido}</p>
+                        <p><strong>Fecha:</strong> ${data.ultimo_pedido.fecha}</p>
+                        <p><strong>Descripción:</strong> ${data.ultimo_pedido.descripcion || 'Sin descripción'}</p>
+                        <p><strong>Productos:</strong> ${data.ultimo_pedido.productos}</p>
+                        <p><strong>Estado:</strong> ${data.ultimo_pedido.estado}</p>
+                    `;
+                } else {
+                    content += `<p>No hay pedidos registrados para este cliente.</p>`;
+                }
+                document.getElementById('detalle-content').innerHTML = content;
+                document.getElementById('detalleModal').classList.add('active');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('detalle-content').innerHTML = '<p>Error al cargar los detalles.</p>';
+                document.getElementById('detalleModal').classList.add('active');
+            });
+        }
+    </script>
 </body>
 </html>
