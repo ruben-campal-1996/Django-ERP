@@ -1,4 +1,3 @@
-<!-- Templates/Inventario/Pedidos.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -9,9 +8,8 @@
     <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
-    <!-- Banda superior -->
     <div class="top-bar">
-        <a href="{% url 'inventario:inventario' %}" class="btn btn-secondary">Volver.</a>
+        <a href="{% url 'inventario:inventario' %}" class="btn btn-secondary">Volver</a>
         <div class="dropdown">
             <button class="username">{{ request.user.nombre }}</button>
             <div class="dropdown-content">
@@ -28,7 +26,9 @@
                 <thead>
                     <tr>
                         <th>ID</th>
+                        <th>Cliente</th> <!-- Nuevo campo -->
                         <th>Productos</th>
+                        <th>Descripción</th>
                         <th>Fecha</th>
                         <th>Precio</th>
                         <th>Estado</th>
@@ -38,11 +38,13 @@
                     {% for item in pedidos_con_precio %}
                     <tr>
                         <td>{{ item.pedido.id_pedido }}</td>
+                        <td>{{ item.pedido.cliente.nombre|default:'Sin cliente' }}</td>
                         <td>
                             {% for detalle in item.pedido.detallepedido_set.all %}
                                 {{ detalle.producto.nombre }} ({{ detalle.cantidad }})<br>
                             {% endfor %}
                         </td>
+                        <td>{{ item.pedido.descripcion|default:'Sin descripción' }}</td>
                         <td>{{ item.pedido.fecha|date:"d/m/Y H:i" }}</td>
                         <td>${{ item.total_precio|floatformat:2 }}</td>
                         <td>
@@ -54,7 +56,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="5">No hay pedidos disponibles.</td>
+                        <td colspan="7">No hay pedidos disponibles.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -85,7 +87,6 @@
             });
         }
 
-        // Script para mostrar/ocultar el desplegable
         document.querySelector('.username').addEventListener('click', function() {
             const dropdown = document.querySelector('.dropdown-content');
             dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';

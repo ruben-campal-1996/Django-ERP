@@ -9,13 +9,33 @@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
+    <div class="top-bar">
+        <a href="{% url 'inventario:pedidos' %}" class="btn btn-secondary">Volver</a>
+        <div class="dropdown">
+            <button class="username">{{ request.user.nombre }}</button>
+            <div class="dropdown-content">
+                <a href="{% url 'usuarios:logout' %}">Cerrar sesión</a>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <h1>Registrar Pedido</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags %}{{ message.tags }}{% endif %}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         <form method="post" action="{% url 'inventario:inventario' %}">
             {% csrf_token %}
             <input type="hidden" name="action" value="pedido">
-            <label for="product-select">Seleccionar productos:</label>
-            <select id="product-select" name="productos[]" multiple="multiple" style="width: 100%;"></select>
+            <div class="form-group">
+                <label for="pedido-descripcion">Descripción del pedido:</label>
+                <textarea id="pedido-descripcion" name="descripcion" class="form-control" rows="3" placeholder="Detalles del pedido (opcional)"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="product-select">Seleccionar productos:</label>
+                <select id="product-select" name="productos[]" multiple="multiple" style="width: 100%;"></select>
+            </div>
             <div id="selected-products"></div>
             <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
         </form>
@@ -50,6 +70,12 @@
                 <button type="button" onclick="$('#prod-${data.id}').remove(); $('#product-select').val(null).trigger('change');">Eliminar</button>
             </div>`;
             $('#selected-products').append(div);
+        });
+
+        // Toggle para el desplegable de usuario
+        document.querySelector('.username').addEventListener('click', function() {
+            const dropdown = document.querySelector('.dropdown-content');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         });
     });
     </script>

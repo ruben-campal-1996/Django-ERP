@@ -3,14 +3,15 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 import random
+from Usuarios.models import Usuario
 
 class Producto(models.Model):
     id_producto = models.CharField(max_length=5, primary_key=True, unique=True)
-    nombre = models.CharField(max_length=200)  # VARCHAR(200)
+    nombre = models.CharField(max_length=200)
     descripcion = models.TextField(blank=True, null=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)  # Número con 2 decimales
-    stock = models.PositiveIntegerField()  # Número entero positivo
-    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)  # Campo opcional para imágenes
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    stock = models.PositiveIntegerField()
+    imagen = models.ImageField(upload_to='productos/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.id_producto:
@@ -51,6 +52,14 @@ class Pedido(models.Model):
     id_pedido = models.AutoField(primary_key=True)
     fecha = models.DateTimeField(auto_now_add=True)
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
+    descripcion = models.TextField(blank=True, null=True)
+    cliente = models.ForeignKey(
+        Usuario,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        limit_choices_to={'rol': 'Cliente'}
+    )  # Nuevo campo
 
     def __str__(self):
         return f"Pedido {self.id_pedido} - {self.estado}"

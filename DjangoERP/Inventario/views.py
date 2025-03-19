@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
-from .models import Producto, MovimientoStock, Pedido, DetallePedido  # Añadimos DetallePedido
+from .models import Producto, MovimientoStock, Pedido, DetallePedido
 from .forms import ProductoForm
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
@@ -15,6 +15,8 @@ import io
 import logging
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -22,16 +24,70 @@ logger = logging.getLogger(__name__)
 def inventario_view(request):
     if request.user.rol != 'Encargado de inventario':
         return redirect('usuarios:logistics')
-    productos = Producto.objects.all()
+    
+    # Obtener el término de búsqueda desde la URL
+    search_term = request.GET.get('search', '')
+    
+    # Filtrar productos por nombre o ID
+    productos_list = Producto.objects.all()
+    if search_term:
+        productos_list = productos_list.filter(
+            Q(nombre__icontains=search_term) | Q(id_producto__icontains=search_term)
+        )
+    
+    # Ordenar y paginar los productos filtrados
+    productos_list = productos_list.order_by('id_producto')
+    paginator = Paginator(productos_list, 10)  # 10 productos por página
+    page_number = request.GET.get('page')
+    productos = paginator.get_page(page_number)
+    
     form = ProductoForm()
 
     if request.method == 'POST':
         action = request.POST.get('action')
         
-        if action == 'pedido':
+        if action == 'create':
+            form = ProductoForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                messages.success(request, 'Producto creado exitosamente.')
+                return redirect('inventario:inventario')
+            else:
+                messages.error(request, 'Error al crear el producto.')
+        
+        elif action == 'edit':
+            product_id = request.POST.get('product_id')
+            try:
+                producto = Producto.objects.get(id_producto=product_id)
+                producto.nombre = request.POST.get('nombre')
+                producto.descripcion = request.POST.get('descripcion')
+                producto.precio = request.POST.get('precio')
+                producto.stock = request.POST.get('stock')
+                if 'imagen' in request.FILES:
+                    producto.imagen = request.FILES['imagen']
+                producto.save()
+                messages.success(request, 'Producto actualizado exitosamente.')
+            except Producto.DoesNotExist:
+                messages.error(request, 'El producto no existe.')
+            except Exception as e:
+                messages.error(request, f'Error al editar el producto: {str(e)}')
+            return redirect('inventario:inventario')
+        
+        elif action == 'delete':
+            product_id = request.POST.get('product_id')
+            try:
+                producto = Producto.objects.get(id_producto=product_id)
+                producto.delete()
+                messages.success(request, 'Producto eliminado exitosamente.')
+            except Producto.DoesNotExist:
+                messages.error(request, 'El producto no existe.')
+            return redirect('inventario:inventario')
+        
+        elif action == 'pedido':
             productos_ids = request.POST.getlist('productos[]')
+            descripcion = request.POST.get('descripcion', '')  # Obtener la descripción
             logger.info(f"Registrando pedido con productos: {productos_ids}")
-            pedido = Pedido.objects.create()
+            pedido = Pedido.objects.create(descripcion=descripcion)  # Crear pedido con descripción
             logger.info(f"Pedido creado con ID: {pedido.id_pedido}")
             try:
                 for prod_id in productos_ids:
@@ -72,54 +128,6 @@ def inventario_view(request):
                 logger.error(f"Error: {str(e)}")
                 return redirect('inventario:inventario')
         
-        elif action == 'delete':
-            product_id = request.POST.get('product_id')
-            try:
-                producto = Producto.objects.get(id_producto=product_id)
-                producto.delete()
-                messages.success(request, 'Producto eliminado exitosamente.')
-            except Producto.DoesNotExist:
-                messages.error(request, 'El producto no existe.')
-            return redirect('inventario:inventario')
-        
-        elif action == 'pedido':
-            productos_ids = request.POST.getlist('productos[]')
-            # Crear un nuevo pedido
-            pedido = Pedido.objects.create()
-            try:
-                for prod_id in productos_ids:
-                    producto = Producto.objects.get(id_producto=prod_id)
-                    cantidad = int(request.POST.get(f'cantidades[{prod_id}]'))
-                    if producto.stock >= cantidad:
-                        producto.stock -= cantidad
-                        producto.save()
-                        MovimientoStock.objects.create(
-                            producto=producto,
-                            tipo='salida',
-                            cantidad=cantidad,
-                            usuario=request.user
-                        )
-                        # Registrar el detalle del pedido
-                        DetallePedido.objects.create(
-                            pedido=pedido,
-                            producto=producto,
-                            cantidad=cantidad
-                        )
-                    else:
-                        messages.error(request, f"Stock insuficiente para {producto.nombre}")
-                        pedido.delete()  # Eliminar el pedido si falla
-                        return redirect('inventario:inventario')
-                messages.success(request, 'Pedido registrado exitosamente.')
-                return redirect('inventario:pedidos')  # Redirigir a la lista de pedidos
-            except Producto.DoesNotExist:
-                messages.error(request, "Producto no encontrado.")
-                pedido.delete()  # Eliminar el pedido si falla
-                return redirect('inventario:inventario')
-            except Exception as e:
-                messages.error(request, f"Error al registrar el pedido: {str(e)}")
-                pedido.delete()  # Eliminar el pedido si falla
-                return redirect('inventario:inventario')
-        
         elif action == 'add_stock':
             productos_ids = request.POST.getlist('productos[]')
             for prod_id in productos_ids:
@@ -142,16 +150,19 @@ def inventario_view(request):
 
     return render(request, 'Inventario/Inventario.html', {
         'productos': productos,
-        'form': form
+        'form': form,
+        'search_term': search_term
     })
 
 @login_required
 def buscar_productos(request):
-    if request.user.rol != 'Encargado de inventario':
+    # Permitimos acceso a "Empleado de ventas" además de "Encargado de inventario"
+    if request.user.rol not in ['Encargado de inventario', 'Empleado de ventas']:
         return JsonResponse([], safe=False)
     term = request.GET.get('term', '')
     productos = Producto.objects.filter(nombre__icontains=term)[:10]
     results = [{'id': p.id_producto, 'text': p.nombre} for p in productos]
+    print(f"Productos encontrados: {results}")  # Depuración
     return JsonResponse(results, safe=False)
 
 @login_required
@@ -243,9 +254,8 @@ def pedidos_view(request):
         models.Q(estado='finalizada', fecha__gte=tres_dias_atras)
     ).order_by('id_pedido')
     
-    logger.info(f"Pedidos recuperados: {list(pedidos)}")  # Log para depurar
+    logger.info(f"Pedidos recuperados: {list(pedidos)}")
 
-    # Calcular el precio total para cada pedido
     pedidos_con_precio = []
     for pedido in pedidos:
         total_precio = sum(
@@ -258,6 +268,7 @@ def pedidos_view(request):
         })
 
     return render(request, 'Inventario/Pedidos.html', {'pedidos_con_precio': pedidos_con_precio})
+
 @csrf_exempt
 def actualizar_estado_pedido(request):
     if request.method == 'POST':

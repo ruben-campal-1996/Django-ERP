@@ -33,6 +33,9 @@
         {% if user.is_authenticated and user.rol == 'Encargado de inventario' %}
             <a href="{% url 'inventario:inventario' %}" class="btn btn-primary">Gestión de Inventario</a>
         {% endif %}
+        {% if user.is_authenticated and user.rol == 'Empleado de ventas' %}
+            <a href="{% url 'ventas:ventas' %}" class="btn btn-primary">Gestión de Ventas</a>
+        {% endif %}
     </div>
 
     <script>

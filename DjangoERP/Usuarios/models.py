@@ -39,7 +39,9 @@ class Usuario(AbstractUser):
     id_usuario = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     correo = models.EmailField(max_length=200, unique=True)
+    telefono = models.CharField(max_length=15, unique=True, blank=True, null=True)
     rol = models.CharField(max_length=30, choices=ROL_CHOICES, default='Cliente')
+    #Tengo que poner este campo por temas de Django y sus configuraciones internas.
     username = models.CharField(max_length=150, unique=False, blank=True, null=True, default=None)
     
     objects = CustomUserManager()
