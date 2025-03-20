@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'Usuarios.apps.UsuariosConfig',
     'Inventario',
     'Ventas',
+    'Contabilidad',
 ]
 
 MIDDLEWARE = [

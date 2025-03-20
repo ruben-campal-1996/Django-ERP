@@ -36,6 +36,9 @@
         {% if user.is_authenticated and user.rol == 'Empleado de ventas' %}
             <a href="{% url 'ventas:ventas' %}" class="btn btn-primary">Gestión de Ventas</a>
         {% endif %}
+        {% if request.user.rol == 'Contable' %}
+            <a href="{% url 'contabilidad:contabilidad' %}" class="btn btn-primary">Contabilidad</a>
+        {% endif %}
     </div>
 
     <script>
