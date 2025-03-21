@@ -84,6 +84,17 @@
     background-color: #c82333;
 }
 
+/* Estilo para los botones compactos (para Saldo, Movimientos, Ganancias) */
+.compact-btn {
+    padding: 4px 8px; /* Reducimos el padding para que ocupen poco más que el texto */
+}
+
+/* Restaurar contorno azul específicamente para btn-outline-primary con compact-btn */
+.btn-outline-primary.compact-btn {
+    border: 1px solid #0d6efd; /* Contorno azul de Bootstrap */
+    color: #0d6efd;
+}
+
 /* Estilo general para el cuerpo */
 body {
     margin: 0;

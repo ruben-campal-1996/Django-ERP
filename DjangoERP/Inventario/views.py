@@ -87,7 +87,7 @@ def inventario_view(request):
             productos_ids = request.POST.getlist('productos[]')
             descripcion = request.POST.get('descripcion', '')  # Obtener la descripción
             logger.info(f"Registrando pedido con productos: {productos_ids}")
-            pedido = Pedido.objects.create(descripcion=descripcion)  # Crear pedido con descripción
+            pedido = Pedido.objects.create(descripcion=descripcion, cliente=request.user)  # Crear pedido con cliente
             logger.info(f"Pedido creado con ID: {pedido.id_pedido}")
             try:
                 for prod_id in productos_ids:
@@ -114,6 +114,37 @@ def inventario_view(request):
                         pedido.delete()
                         logger.info("Pedido eliminado por stock insuficiente")
                         return redirect('inventario:inventario')
+                
+                # Crear la transacción al generar el pedido
+                from Contabilidad.models import Budget, Transaccion  # Importar aquí para evitar circularidad
+                monto = sum(
+                    detalle.producto.precio * detalle.cantidad
+                    for detalle in pedido.detallepedido_set.all()
+                )
+                
+                budget = Budget.objects.first()
+                if not budget:
+                    budget = Budget.objects.create()
+
+                rol = pedido.cliente.rol
+                if rol == 'Encargado de inventario':
+                    tipo = 'egreso'
+                    descripcion_trans = f"Gasto por pedido {pedido.id_pedido} (reabastecimiento)"
+                elif rol in ['Cliente', 'Empleado de ventas']:
+                    tipo = 'ingreso'
+                    descripcion_trans = f"Ingreso por pedido {pedido.id_pedido} (venta)"
+                else:
+                    tipo = None  # No crear transacción para otros roles
+
+                if tipo:
+                    Transaccion.objects.create(
+                        budget=budget,
+                        tipo=tipo,
+                        monto=monto,
+                        descripcion=descripcion_trans,
+                        pedido=pedido
+                    )
+                
                 messages.success(request, 'Pedido registrado exitosamente.')
                 logger.info("Pedido registrado con éxito")
                 return redirect('inventario:pedidos')

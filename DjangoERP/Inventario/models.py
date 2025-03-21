@@ -54,11 +54,10 @@ class Pedido(models.Model):
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='en_proceso')
     descripcion = models.TextField(blank=True, null=True)
     cliente = models.ForeignKey(
-        Usuario,
+        'Usuarios.Usuario',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        limit_choices_to={'rol': 'Cliente'}
     )  # Nuevo campo
 
     def __str__(self):

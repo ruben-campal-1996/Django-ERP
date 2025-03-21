@@ -1,10 +1,11 @@
-{% load static %}
+{% load static django_bootstrap5 %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contabilidad</title>
+    {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
@@ -17,11 +18,24 @@
             </div>
         </div>
     </div>
+
     <div class="container">
         <h1>Gestión de Contabilidad</h1>
         <p>Bienvenido al módulo de Contabilidad. Aquí gestionaremos el budget, ganancias y pérdidas.</p>
+
+        <div class="btn-group" role="group" aria-label="Opciones de Contabilidad">
+            <input type="radio" class="btn-check" name="contabilidad_options" id="btnradio1" autocomplete="off" checked>
+            <label class="btn btn-outline-primary compact-btn" for="btnradio1">Saldo</label>
+
+            <input type="radio" class="btn-check" name="contabilidad_options" id="btnradio2" autocomplete="off">
+            <label class="btn btn-outline-primary compact-btn" for="btnradio2">Movimientos</label>
+
+            <input type="radio" class="btn-check" name="contabilidad_options" id="btnradio3" autocomplete="off">
+            <label class="btn btn-outline-primary compact-btn" for="btnradio3">Ganancias</label>
+        </div>
     </div>
 
+    {% bootstrap_javascript %}
     <script>
         document.querySelector('.username').addEventListener('click', function() {
             const dropdown = document.querySelector('.dropdown-content');

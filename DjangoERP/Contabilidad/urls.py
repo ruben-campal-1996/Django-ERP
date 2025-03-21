@@ -6,5 +6,5 @@ from . import views
 app_name = 'contabilidad'
 
 urlpatterns = [
-    path('Logistics/contabilidad', views.contabilidad_view, name='contabilidad'),
-] + static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+    path('', views.contabilidad_view, name='contabilidad'),
+]
