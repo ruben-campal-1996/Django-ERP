@@ -8,13 +8,14 @@ from django.http import JsonResponse
 from Usuarios.models import Usuario
 from Usuarios.forms import UsuarioCreationForm
 from Inventario.models import Producto, Pedido, DetallePedido, MovimientoStock
+from Contabilidad.models import Budget, Transaccion
+
 
 @login_required
 def ventas_view(request):
     if request.user.rol != 'Empleado de ventas':
         return redirect('usuarios:logistics')
     
-    # Búsqueda y filtrado
     search_term = request.GET.get('search', '')
     clientes_list = Usuario.objects.filter(rol='Cliente', is_superuser=False)
     if search_term:
@@ -24,13 +25,11 @@ def ventas_view(request):
             Q(telefono__icontains=search_term)
         )
     
-    # Paginación
     clientes_list = clientes_list.order_by('id_usuario')
     paginator = Paginator(clientes_list, 10)
     page_number = request.GET.get('page')
     clientes = paginator.get_page(page_number)
     
-    # Formulario para crear clientes y pedidos
     form = UsuarioCreationForm()
     if request.method == 'POST':
         if 'create_cliente' in request.POST:
@@ -72,6 +71,30 @@ def ventas_view(request):
                         messages.error(request, f"Stock insuficiente para {producto.nombre}")
                         pedido.delete()
                         return redirect('ventas:ventas')
+                monto = sum(
+                    detalle.producto.precio * detalle.cantidad
+                    for detalle in pedido.detallepedido_set.all()
+                )
+                budget = Budget.objects.first()
+                if not budget:
+                    budget = Budget.objects.create()
+                rol = pedido.cliente.rol
+                if rol == 'Encargado de inventario':
+                    tipo = 'egreso'
+                    descripcion_trans = f"Gasto por pedido {pedido.id_pedido} (reabastecimiento)"
+                elif rol in ['Cliente', 'Empleado de ventas']:
+                    tipo = 'ingreso'
+                    descripcion_trans = f"Ingreso por pedido {pedido.id_pedido} (venta)"
+                else:
+                    tipo = None
+                if tipo:
+                    Transaccion.objects.create(
+                        budget=budget,
+                        tipo=tipo,
+                        monto=monto,
+                        descripcion=descripcion_trans,
+                        pedido=pedido
+                    )
                 messages.success(request, 'Pedido registrado exitosamente.')
                 return redirect('ventas:ventas')
             except Exception as e:
@@ -83,7 +106,7 @@ def ventas_view(request):
         'form': form,
         'search_term': search_term
     })
-
+            
 @login_required
 def buscar_clientes(request):
     if request.user.rol != 'Empleado de ventas':

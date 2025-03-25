@@ -11,12 +11,13 @@ from reportlab.lib.styles import getSampleStyleSheet
 from django.utils import timezone
 from datetime import timedelta
 from django.db import models
-import io
-import logging
-import json
 from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from django.db.models import Q
+from Contabilidad.models import Budget, Transaccion
+import io
+import logging
+import json 
 
 logger = logging.getLogger(__name__)
 
@@ -25,24 +26,19 @@ def inventario_view(request):
     if request.user.rol != 'Encargado de inventario':
         return redirect('usuarios:logistics')
     
-    # Obtener el término de búsqueda desde la URL
     search_term = request.GET.get('search', '')
-    
-    # Filtrar productos por nombre o ID
     productos_list = Producto.objects.all()
     if search_term:
         productos_list = productos_list.filter(
             Q(nombre__icontains=search_term) | Q(id_producto__icontains=search_term)
         )
     
-    # Ordenar y paginar los productos filtrados
     productos_list = productos_list.order_by('id_producto')
-    paginator = Paginator(productos_list, 10)  # 10 productos por página
+    paginator = Paginator(productos_list, 10)
     page_number = request.GET.get('page')
     productos = paginator.get_page(page_number)
     
     form = ProductoForm()
-
     if request.method == 'POST':
         action = request.POST.get('action')
         
@@ -85,9 +81,9 @@ def inventario_view(request):
         
         elif action == 'pedido':
             productos_ids = request.POST.getlist('productos[]')
-            descripcion = request.POST.get('descripcion', '')  # Obtener la descripción
+            descripcion = request.POST.get('descripcion', '')
             logger.info(f"Registrando pedido con productos: {productos_ids}")
-            pedido = Pedido.objects.create(descripcion=descripcion, cliente=request.user)  # Crear pedido con cliente
+            pedido = Pedido.objects.create(descripcion=descripcion, cliente=request.user)
             logger.info(f"Pedido creado con ID: {pedido.id_pedido}")
             try:
                 for prod_id in productos_ids:
@@ -114,18 +110,13 @@ def inventario_view(request):
                         pedido.delete()
                         logger.info("Pedido eliminado por stock insuficiente")
                         return redirect('inventario:inventario')
-                
-                # Crear la transacción al generar el pedido
-                from Contabilidad.models import Budget, Transaccion  # Importar aquí para evitar circularidad
                 monto = sum(
                     detalle.producto.precio * detalle.cantidad
                     for detalle in pedido.detallepedido_set.all()
                 )
-                
                 budget = Budget.objects.first()
                 if not budget:
                     budget = Budget.objects.create()
-
                 rol = pedido.cliente.rol
                 if rol == 'Encargado de inventario':
                     tipo = 'egreso'
@@ -134,8 +125,7 @@ def inventario_view(request):
                     tipo = 'ingreso'
                     descripcion_trans = f"Ingreso por pedido {pedido.id_pedido} (venta)"
                 else:
-                    tipo = None  # No crear transacción para otros roles
-
+                    tipo = None
                 if tipo:
                     Transaccion.objects.create(
                         budget=budget,
@@ -144,7 +134,6 @@ def inventario_view(request):
                         descripcion=descripcion_trans,
                         pedido=pedido
                     )
-                
                 messages.success(request, 'Pedido registrado exitosamente.')
                 logger.info("Pedido registrado con éxito")
                 return redirect('inventario:pedidos')

@@ -1,4 +1,3 @@
-# Usuarios/views.py
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model, login, logout, authenticate  # Cambiamos User por get_user_model

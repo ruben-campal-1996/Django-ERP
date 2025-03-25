@@ -10,13 +10,17 @@
 </head>
 <body>
     <div class="top-bar">
-        <a href="{% url 'usuarios:logistics' %}" class="btn btn-secondary">Volver</a>
-        <div class="dropdown">
-            <button class="username">{{ request.user.nombre }}</button>
-            <div class="dropdown-content">
-                <a href="{% url 'usuarios:logout' %}">Cerrar sesión</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'usuarios:logistics' %}" class="btn btn-secondary">Volver</a>
+            <div class="dropdown">
+                <button type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ user.nombre }}
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'usuarios:logout' %}">Cerrar sesión</a></li>
+                </ul>
             </div>
-        </div>
+        {% endif %}
     </div>
 
     <div class="container">
@@ -33,13 +37,69 @@
             <input type="radio" class="btn-check" name="contabilidad_options" id="btnradio3" autocomplete="off">
             <label class="btn btn-outline-primary compact-btn" for="btnradio3">Ganancias</label>
         </div>
+
+        <div id="contabilidad-content" class="mt-4">
+            <!-- Sección Saldo -->
+            <div id="saldo-section" class="content-section" style="display: block;">
+                <p class="fs-3">${{ budget.monto }}</p>
+            </div>
+
+            <!-- Sección Movimientos -->
+            <div id="movimientos-section" class="content-section" style="display: none;">
+                <div class="table-container">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Tipo</th>
+                                <th>Monto</th>
+                                <th>Descripción</th>
+                                <th>ID Pedido</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaccion in transacciones %}
+                            <tr>
+                                <td>{{ transaccion.fecha|date:"d/m/Y H:i" }}</td>
+                                <td>{{ transaccion.get_tipo_display }}</td>
+                                <td>${{ transaccion.monto }}</td>
+                                <td>{{ transaccion.descripcion }}</td>
+                                <td>{{ transaccion.pedido.id_pedido|default:"N/A" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5">No hay transacciones registradas.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sección Ganancias -->
+            <div id="ganancias-section" class="content-section" style="display: none;">
+                <p class="fs-3 {% if ganancias_perdidas >= 0 %}text-success{% else %}text-danger{% endif %}">
+                    Total desde el inicio: ${{ ganancias_perdidas }}
+                </p>
+            </div>
+        </div>
     </div>
 
     {% bootstrap_javascript %}
     <script>
-        document.querySelector('.username').addEventListener('click', function() {
-            const dropdown = document.querySelector('.dropdown-content');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        document.querySelectorAll('.btn-check').forEach(radio => {
+            radio.addEventListener('change', function() {
+                const sections = document.querySelectorAll('.content-section');
+                sections.forEach(section => section.style.display = 'none');
+
+                if (this.id === 'btnradio1') {
+                    document.getElementById('saldo-section').style.display = 'block';
+                } else if (this.id === 'btnradio2') {
+                    document.getElementById('movimientos-section').style.display = 'block';
+                } else if (this.id === 'btnradio3') {
+                    document.getElementById('ganancias-section').style.display = 'block';
+                }
+            });
         });
     </script>
 </body>
