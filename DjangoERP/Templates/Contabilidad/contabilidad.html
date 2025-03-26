@@ -25,8 +25,7 @@
 
     <div class="container">
         <h1>Gestión de Contabilidad</h1>
-        <p>Bienvenido al módulo de Contabilidad. Aquí gestionaremos el budget, ganancias y pérdidas.</p>
-
+        
         <div class="btn-group" role="group" aria-label="Opciones de Contabilidad">
             <input type="radio" class="btn-check" name="contabilidad_options" id="btnradio1" autocomplete="off" checked>
             <label class="btn btn-outline-primary compact-btn" for="btnradio1">Saldo</label>
@@ -74,6 +73,12 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Paginador -->
+                {% if transacciones.has_other_pages %}
+                <nav aria-label="Page navigation example" class="mt-4">
+                    {% bootstrap_pagination transacciones url="?page=" %}
+                </nav>
+                {% endif %}
             </div>
 
             <!-- Sección Ganancias -->
@@ -87,19 +92,37 @@
 
     {% bootstrap_javascript %}
     <script>
+        // Función para mostrar la sección correcta
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+        }
+
+        // Manejar clics en los radio buttons
         document.querySelectorAll('.btn-check').forEach(radio => {
             radio.addEventListener('change', function() {
-                const sections = document.querySelectorAll('.content-section');
-                sections.forEach(section => section.style.display = 'none');
-
                 if (this.id === 'btnradio1') {
-                    document.getElementById('saldo-section').style.display = 'block';
+                    showSection('saldo-section');
                 } else if (this.id === 'btnradio2') {
-                    document.getElementById('movimientos-section').style.display = 'block';
+                    showSection('movimientos-section');
                 } else if (this.id === 'btnradio3') {
-                    document.getElementById('ganancias-section').style.display = 'block';
+                    showSection('ganancias-section');
                 }
             });
+        });
+
+        // Al cargar la página, verificar si hay un parámetro 'page' y mostrar 'Movimientos'
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('page')) {
+                document.getElementById('btnradio2').checked = true; // Seleccionar "Movimientos"
+                showSection('movimientos-section');
+            } else {
+                // Mantener el comportamiento por defecto (Saldo seleccionado)
+                document.getElementById('btnradio1').checked = true;
+                showSection('saldo-section');
+            }
         });
     </script>
 </body>

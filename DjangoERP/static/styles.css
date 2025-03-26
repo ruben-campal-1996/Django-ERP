@@ -234,3 +234,27 @@ body {
 .container h1 {
     margin-bottom: 30px;
 }
+
+.row {
+    justify-content: center;
+    max-width: 650px; /* Limita el ancho para que quepan 2 cards de 300px + espacio */
+    margin: 0 auto; /* Centra el row */
+}
+
+/* Espacio entre filas */
+.row + .row {
+    margin-top: 20px;
+}
+
+/* Reducir el espacio horizontal entre cards */
+.row > div {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+/* Asegurar que las cards estén centradas y tengan tamaño uniforme */
+.card {
+    max-width: 300px;
+    margin: 0 auto;
+    height: 400px;
+}

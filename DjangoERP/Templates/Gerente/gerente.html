@@ -1,0 +1,90 @@
+{% load static django_bootstrap5 %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vista Gerente</title>
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <div class="top-bar">
+        <a href="{% url 'usuarios:logistics' %}" class="btn btn-secondary">Volver</a>
+        <div class="dropdown">
+            <button type="button" class="btn btn-dark dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ user.nombre }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'usuarios:logout' %}">Cerrar sesión</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>Vista Gerente</h1>
+        <p>Bienvenido a la vista del Gerente. Aquí podrás gestionar aspectos clave del sistema.</p>
+
+        <!-- Contenedores centrados en cuadrado (2x2) -->
+<div class="row justify-content-center">
+    <!-- Fila 1 -->
+    <div class="col-md-6">
+        <!-- Card 1: Inventario -->
+        <div class="card">
+            <div class="card-img-top">
+                <span class="placeholder" style="width: 100%; height: 200px; background-color: #ffe30b;"></span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Inventario</h5>
+                <p class="card-text">Gestiona desde aquí el stock del almacén.</p>
+                <a href="#" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!-- Card 2: Pedidos -->
+        <div class="card">
+            <div class="card-img-top">
+                <span class="placeholder" style="width: 100%; height: 200px; background-color: #ff9d00;"></span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Pedidos</h5>
+                <p class="card-text">Consulta el historial de pedidos</p>
+                <a href="#" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <!-- Fila 2 -->
+    <div class="col-md-6">
+        <!-- Card 3: Contabilidad -->
+        <div class="card">
+            <div class="card-img-top">
+                <span class="placeholder" style="width: 100%; height: 200px; background-color: #03a2ff;"></span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Contabilidad</h5>
+                <p class="card-text">Consultar movimientos y transacciones del proyecto.</p>
+                <a href="#" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!-- Card 4: Informes -->
+        <div class="card">
+            <div class="card-img-top">
+                <span class="placeholder" style="width: 100%; height: 200px; background-color: #ff0000;"></span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Informes</h5>
+                <p class="card-text">Descarga los informes referentes a ventas y a registro de entrada/salida de inventario.</p>
+                <a href="#" class="btn btn-primary">Gestionar</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+    {% bootstrap_javascript %}
+</body>
+</html>

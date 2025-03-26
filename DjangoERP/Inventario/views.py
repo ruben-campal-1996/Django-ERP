@@ -15,6 +15,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import Paginator
 from django.db.models import Q
 from Contabilidad.models import Budget, Transaccion
+from decimal import Decimal
 import io
 import logging
 import json 
@@ -110,23 +111,32 @@ def inventario_view(request):
                         pedido.delete()
                         logger.info("Pedido eliminado por stock insuficiente")
                         return redirect('inventario:inventario')
-                monto = sum(
+                monto_base = sum(
                     detalle.producto.precio * detalle.cantidad
                     for detalle in pedido.detallepedido_set.all()
                 )
+                logger.info(f"Monto base calculado: {monto_base}")
+                if pedido.cliente.rol == 'Encargado de inventario':
+                    monto = monto_base * Decimal('0.75')
+                    logger.info(f"Rol: {pedido.cliente.rol}, Monto con descuento (25%): {monto}")
+                else:
+                    monto = monto_base
+                    logger.info(f"Rol: {pedido.cliente.rol}, Monto sin descuento: {monto}")
+                
                 budget = Budget.objects.first()
                 if not budget:
                     budget = Budget.objects.create()
                 rol = pedido.cliente.rol
                 if rol == 'Encargado de inventario':
                     tipo = 'egreso'
-                    descripcion_trans = f"Gasto por pedido {pedido.id_pedido} (reabastecimiento)"
+                    descripcion_trans = f"Gasto por pedido {pedido.id_pedido} (reabastecimiento, 25% descuento)"
                 elif rol in ['Cliente', 'Empleado de ventas']:
                     tipo = 'ingreso'
                     descripcion_trans = f"Ingreso por pedido {pedido.id_pedido} (venta)"
                 else:
                     tipo = None
                 if tipo:
+                    logger.info(f"Creando transacción: {tipo} - Monto: {monto}")
                     Transaccion.objects.create(
                         budget=budget,
                         tipo=tipo,
@@ -167,7 +177,7 @@ def inventario_view(request):
                     return redirect('inventario:inventario')
             messages.success(request, 'Stock recibido exitosamente.')
             return redirect('inventario:inventario')
-
+    
     return render(request, 'Inventario/Inventario.html', {
         'productos': productos,
         'form': form,
@@ -176,7 +186,6 @@ def inventario_view(request):
 
 @login_required
 def buscar_productos(request):
-    # Permitimos acceso a "Empleado de ventas" además de "Encargado de inventario"
     if request.user.rol not in ['Encargado de inventario', 'Empleado de ventas']:
         return JsonResponse([], safe=False)
     term = request.GET.get('term', '')
@@ -278,10 +287,16 @@ def pedidos_view(request):
 
     pedidos_con_precio = []
     for pedido in pedidos:
-        total_precio = sum(
-            detalle.producto.precio * detalle.cantidad 
-            for detalle in pedido.detallepedido_set.all()
-        )
+        transaccion = Transaccion.objects.filter(pedido=pedido).first()
+        if transaccion:
+            total_precio = transaccion.monto
+            logger.info(f"Pedido {pedido.id_pedido} usando transaccion.monto: {total_precio}")
+        else:
+            total_precio = sum(
+                detalle.producto.precio * detalle.cantidad 
+                for detalle in pedido.detallepedido_set.all()
+            )
+            logger.info(f"Pedido {pedido.id_pedido} calculado sin transacción: {total_precio}")
         pedidos_con_precio.append({
             'pedido': pedido,
             'total_precio': total_precio

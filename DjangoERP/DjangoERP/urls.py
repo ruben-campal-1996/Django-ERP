@@ -29,4 +29,5 @@ urlpatterns = [
     path('Logistics/inventario/', include('Inventario.urls', namespace='inventario')),
     path('Logistics/ventas/', include('Ventas.urls')),
     path('Logistics/contabilidad/', include('Contabilidad.urls')),
+    path('Logistics/gerente/', include('Gerente.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

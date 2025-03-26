@@ -1,0 +1,48 @@
+@startuml Diagrama_Casos_de_Uso_ERP
+
+' Forzar dirección vertical
+top to bottom direction
+
+' Actores (los ponemos en una columna)
+actor "Administrador" as Admin
+actor "Gerente" as Gerente
+actor "Empleado de Ventas" as EmpVentas
+actor "Encargado de Inventario" as EncInventario
+actor "Contable" as Contable
+
+' Casos de uso
+(Administrar Usuarios) as GestionUsuarios
+(Crear Pedidos) as CrearPedidos
+(Ver Detalles de Clientes) as VerDetallesClientes
+(Gestionar Inventario) as GestionInventario
+(Descargar Historial) as DescargarHistorial
+(Consultar Finanzas) as ConsultarFinanzas
+
+' Relaciones entre actores y casos de uso
+Admin --> GestionUsuarios : Crear/Editar/Eliminar usuarios
+EmpVentas --> CrearPedidos
+EmpVentas --> GestionUsuarios : Crear (rol Cliente)
+EmpVentas --> VerDetallesClientes
+EncInventario --> GestionInventario : Añadir productos/stock
+EncInventario --> CrearPedidos
+EncInventario --> DescargarHistorial : Historial (PDF)
+Contable --> ConsultarFinanzas : Saldo/Movimientos/Ganancias
+
+' Notas (simplificadas y opcionales)
+note right of GestionUsuarios
+  Nombre, correo, etc.
+end note
+
+note right of DescargarHistorial
+  PDF
+end note
+
+note right of ConsultarFinanzas
+  Finanzas totales
+end note
+
+' Estilización
+skinparam monochrome true
+skinparam padding 2
+
+@enduml

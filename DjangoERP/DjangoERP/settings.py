@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Gerente.apps.GerenteConfig',
+    'django_extensions',
     'django_bootstrap5',
     'Usuarios.apps.UsuariosConfig',
     'Inventario',
