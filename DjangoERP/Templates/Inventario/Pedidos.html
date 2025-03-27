@@ -52,9 +52,9 @@
                         <td>${{ item.total_precio|floatformat:2 }}</td>
                         <td>
                             {% if request.user.rol == 'Encargado de inventario' %}
-                                <select name="estado" onchange="actualizarEstado({{ item.pedido.id_pedido }}, this.value)">
-                                    <option value="en_proceso" {% if item.pedido.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
-                                    <option value="finalizada" {% if item.pedido.estado == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                                <select name="estado" onchange="actualizarEstado({ item.pedido.id_pedido }, this.value)">
+                                    <option value="en_proceso" {% if item.pedido.estado = 'en_proceso' %}selected{% endif %}>En proceso</option>
+                                    <option value="finalizada" {% if item.pedido.estado = 'finalizada' %}selected{% endif %}>Finalizada</option>
                                 </select>
                             {% else %}
                                 {{ item.pedido.estado|capfirst }}

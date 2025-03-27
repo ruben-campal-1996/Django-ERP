@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
+from django.utils import timezone
 from Contabilidad.models import Budget, Transaccion
 from Inventario.models import Producto, MovimientoStock
 from reportlab.lib.pagesizes import letter
@@ -9,7 +10,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 import io
 import zipfile
-from datetime import datetime
+from datetime import datetime, timedelta
 
 @login_required
 def gerente_view(request):

@@ -90,7 +90,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                <button class="btn btn-primary" onclick="openEditModal('{{ producto.id_producto }}', '{{ producto.nombre|escapejs }}', '{{ producto.descripcion|default:''|escapejs }}', '{{ producto.precio }}', '{{ producto.stock }}')">Editar</button>
+                                <button class="btn btn-primary" onclick="openEditModal('{{ producto.id_producto }}', '{{ producto.nombre|escapejs }}', '{{ producto.descripcion|default:|escapejs }}', '{{ producto.precio }}', '{{ producto.stock }}')">Editar</button>
                                 <button class="btn btn-secondary" onclick="deleteProduct('{{ producto.id_producto }}')">Eliminar</button>
                             </td>
                         </tr>

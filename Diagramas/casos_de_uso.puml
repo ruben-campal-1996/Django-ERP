@@ -1,0 +1,55 @@
+@startuml Diagrama_Casos_de_Uso_ERP
+
+' Forzar dirección vertical
+top to bottom direction
+
+' Actores
+actor "Administrador" as Admin
+actor "Gerente" as Gerente
+actor "Empleado de Ventas" as EmpVentas
+actor "Encargado de Inventario" as EncInventario
+actor "Contable" as Contable
+
+' Paquetes para agrupar casos de uso
+package "Gestión de Usuarios" {
+  (Administrar Usuarios) as GestionUsuarios
+  (Ver Detalles de Clientes) as VerDetallesClientes
+}
+
+package "Pedidos e Inventario" {
+  (Crear Pedidos) as CrearPedidos
+  (Gestionar Inventario) as GestionInventario
+  (Descargar Historial) as DescargarHistorial
+}
+
+package "Finanzas y Reportes" {
+  (Consultar Finanzas) as ConsultarFinanzas
+  (Acceder a Vistas) as AccederVistas
+  (Descargar Informes) as DescargarInformes
+}
+
+' Relaciones
+Admin --> GestionUsuarios : Crear/Editar/Eliminar
+EmpVentas --> CrearPedidos
+EmpVentas --> GestionUsuarios : Crear (rol Cliente)
+EmpVentas --> VerDetallesClientes
+EncInventario --> GestionInventario : Añadir productos/stock
+EncInventario --> CrearPedidos
+EncInventario --> DescargarHistorial : Historial (PDF)
+Contable --> ConsultarFinanzas : Saldo/Movimientos/Ganancias
+Gerente --> AccederVistas : Inventario/Pedidos/Contabilidad
+Gerente --> DescargarInformes : Informes PDF
+
+' Notas simplificadas
+note right of GestionUsuarios : Nombre, correo, etc.
+note right of DescargarHistorial : PDF
+note right of ConsultarFinanzas : Finanzas totales
+note right of DescargarInformes : PDF departamentos
+
+' Estilización
+skinparam monochrome true
+skinparam padding 2
+skinparam defaultFontSize 10
+skinparam packageStyle rectangle
+
+@enduml
