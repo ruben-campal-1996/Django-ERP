@@ -20,7 +20,10 @@
 
     <div class="container">
         <h1>Pedidos</h1>
-        <a href="{% url 'inventario:add_pedido' %}" class="btn btn-primary">Añadir Pedido</a>
+        {% if request.user.rol == 'Encargado de inventario' %}
+            <a href="{% url 'inventario:add_pedido' %}" class="btn btn-primary">Añadir Pedido</a>
+        {% endif %}
+    <div class="table-container">
         <div class="table-container">
             <table class="user-table">
                 <thead>
@@ -48,10 +51,14 @@
                         <td>{{ item.pedido.fecha|date:"d/m/Y H:i" }}</td>
                         <td>${{ item.total_precio|floatformat:2 }}</td>
                         <td>
-                            <select name="estado" onchange="actualizarEstado({{ item.pedido.id_pedido }}, this.value)">
-                                <option value="en_proceso" {% if item.pedido.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
-                                <option value="finalizada" {% if item.pedido.estado == 'finalizada' %}selected{% endif %}>Finalizada</option>
-                            </select>
+                            {% if request.user.rol == 'Encargado de inventario' %}
+                                <select name="estado" onchange="actualizarEstado({{ item.pedido.id_pedido }}, this.value)">
+                                    <option value="en_proceso" {% if item.pedido.estado == 'en_proceso' %}selected{% endif %}>En proceso</option>
+                                    <option value="finalizada" {% if item.pedido.estado == 'finalizada' %}selected{% endif %}>Finalizada</option>
+                                </select>
+                            {% else %}
+                                {{ item.pedido.estado|capfirst }}
+                            {% endif %}
                         </td>
                     </tr>
                     {% empty %}

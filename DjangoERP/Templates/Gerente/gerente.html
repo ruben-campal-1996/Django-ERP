@@ -23,7 +23,6 @@
 
     <div class="container">
         <h1>Vista Gerente</h1>
-        <p>Bienvenido a la vista del Gerente. Aquí podrás gestionar aspectos clave del sistema.</p>
 
         <!-- Contenedores centrados en cuadrado (2x2) -->
 <div class="row justify-content-center">
@@ -37,7 +36,7 @@
             <div class="card-body">
                 <h5 class="card-title">Inventario</h5>
                 <p class="card-text">Gestiona desde aquí el stock del almacén.</p>
-                <a href="#" class="btn btn-primary">Gestionar</a>
+                <a href="{% url 'inventario:inventario' %}" class="btn btn-primary">Inventario</a>
             </div>
         </div>
     </div>
@@ -50,7 +49,7 @@
             <div class="card-body">
                 <h5 class="card-title">Pedidos</h5>
                 <p class="card-text">Consulta el historial de pedidos</p>
-                <a href="#" class="btn btn-primary">Gestionar</a>
+                <a href="{% url 'inventario:pedidos' %}" class="btn btn-primary">Pedidos</a>
             </div>
         </div>
     </div>
@@ -66,7 +65,7 @@
             <div class="card-body">
                 <h5 class="card-title">Contabilidad</h5>
                 <p class="card-text">Consultar movimientos y transacciones del proyecto.</p>
-                <a href="#" class="btn btn-primary">Gestionar</a>
+                <a href="{% url 'contabilidad:contabilidad' %}" class="btn btn-primary">Contabilidad</a>
             </div>
         </div>
     </div>
@@ -79,7 +78,17 @@
             <div class="card-body">
                 <h5 class="card-title">Informes</h5>
                 <p class="card-text">Descarga los informes referentes a ventas y a registro de entrada/salida de inventario.</p>
-                <a href="#" class="btn btn-primary">Gestionar</a>
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Descargar Informes
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="{% url 'Gerente:descargar_informes' %}?periodo=24h">Últimas 24 horas</a></li>
+                        <li><a class="dropdown-item" href="{% url 'Gerente:descargar_informes' %}?periodo=3d">Últimos 3 días</a></li>
+                        <li><a class="dropdown-item" href="{% url 'Gerente:descargar_informes' %}?periodo=7d">Última semana</a></li>
+                    </ul>
+                </div>
+                </div>
             </div>
         </div>
     </div>

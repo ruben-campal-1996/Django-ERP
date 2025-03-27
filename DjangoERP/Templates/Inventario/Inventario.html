@@ -1,10 +1,11 @@
-{% load static %}
+{% load static django_bootstrap5 %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Inventario</title>
+    {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'styles.css' %}">
     <!-- Select2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -13,10 +14,12 @@
     <div class="top-bar">
         <a href="{% url 'usuarios:logistics' %}" class="btn btn-secondary">Volver</a>
         <div class="dropdown">
-            <button class="username">{{ request.user.nombre }}</button>
-            <div class="dropdown-content">
-                <a href="{% url 'usuarios:logout' %}">Cerrar sesión</a>
-            </div>
+            <button class="btn btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                {{ request.user.nombre }}
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'usuarios:logout' %}">Cerrar sesión</a></li>
+            </ul>
         </div>
     </div>
     <div class="container">
@@ -27,12 +30,29 @@
             {% endfor %}
         {% endif %}
 
-        <!-- Botones -->
-        <button class="btn btn-primary" onclick="document.getElementById('addModal').classList.add('active')">Añadir Producto</button>
-        <a href="{% url 'inventario:pedidos' %}" class="btn btn-primary">Pedidos</a>
-        <button class="btn btn-primary" onclick="document.getElementById('stockModal').classList.add('active')">Recibir Stock</button>
-        <a href="{% url 'inventario:descargar_registro' %}" class="btn btn-primary">Registro de Movimientos</a>
-        <a href="{% url 'inventario:descargar_inventario' %}" class="btn btn-primary">Registro de Inventario</a>
+        <!-- Botones centrados -->
+        <div class="d-flex justify-content-center align-items-center mb-4 flex-wrap">
+            {% if request.user.rol == 'Encargado de inventario' %}
+                <button class="btn btn-primary me-2 mb-2" onclick="document.getElementById('addModal').classList.add('active')">Añadir Producto</button>
+                <a href="{% url 'inventario:pedidos' %}" class="btn btn-primary me-2 mb-2">Pedidos</a>
+                <button class="btn btn-primary me-2 mb-2" onclick="document.getElementById('stockModal').classList.add('active')">Recibir Stock</button>
+            {% endif %}
+
+            <!-- Dropdown para Registro de Movimientos -->
+            <div class="btn-group dropdown me-2 mb-2">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Registro de Movimientos
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'inventario:descargar_registro' %}?periodo=24h">Últimas 24 horas</a></li>
+                    <li><a class="dropdown-item" href="{% url 'inventario:descargar_registro' %}?periodo=3d">Últimos 3 días</a></li>
+                    <li><a class="dropdown-item" href="{% url 'inventario:descargar_registro' %}?periodo=7d">Última semana</a></li>
+                </ul>
+            </div>
+
+            <!-- Botón para Registro de Inventario -->
+            <a href="{% url 'inventario:descargar_inventario' %}" class="btn btn-primary mb-2">Registro de Inventario</a>
+        </div>
 
         <!-- Formulario de búsqueda -->
         <form method="get" action="{% url 'inventario:inventario' %}" class="form-group" style="margin-top: 20px;">
@@ -194,6 +214,7 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    {% bootstrap_javascript %}
     <script>
         function deleteProduct(productId) {
             if (confirm('¿Estás seguro de que quieres eliminar este producto?')) {
@@ -286,12 +307,6 @@
                     <button type="button" onclick="$('#stock-prod-${data.id}').remove();">Eliminar</button>
                 </div>`;
                 $('#stock-selected-products').append(div);
-            });
-
-            // Toggle para el desplegable de usuario
-            document.querySelector('.username').addEventListener('click', function() {
-                const dropdown = document.querySelector('.dropdown-content');
-                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
             });
         });
     </script>

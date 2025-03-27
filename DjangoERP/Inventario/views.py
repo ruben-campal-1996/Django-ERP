@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 @login_required
 def inventario_view(request):
-    if request.user.rol != 'Encargado de inventario':
+    if request.user.rol not in ['Encargado de inventario', 'Gerente']:
         return redirect('usuarios:logistics')
     
     search_term = request.GET.get('search', '')
@@ -196,14 +196,26 @@ def buscar_productos(request):
 
 @login_required
 def descargar_registro(request):
-    if request.user.rol != 'Encargado de inventario':
+    if request.user.rol not in ['Encargado de inventario', 'Gerente']:
         return redirect('usuarios:logistics')
-    movimientos = MovimientoStock.objects.all().order_by('-fecha')
+    
+    # Obtener el período desde el parámetro GET
+    periodo = request.GET.get('periodo', '7d')  # Por defecto: 7 días
+    if periodo == '24h':
+        delta = timedelta(hours=24)
+    elif periodo == '3d':
+        delta = timedelta(days=3)
+    else:  # '7d' o cualquier otro valor
+        delta = timedelta(days=7)
+    
+    fecha_limite = timezone.now() - delta
+    movimientos = MovimientoStock.objects.filter(fecha__gte=fecha_limite).order_by('-fecha')
+    
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     elements = []
     styles = getSampleStyleSheet()
-    elements.append(Paragraph("Registro de Movimientos de Inventario", styles['Heading1']))
+    elements.append(Paragraph(f"Registro de Movimientos de Inventario (Últimos {periodo})", styles['Heading1']))
     data = [['ID', 'Producto', 'Tipo', 'Cantidad', 'Fecha', 'Usuario']]
     for mov in movimientos:
         usuario = mov.usuario.nombre if mov.usuario else 'N/A'
@@ -277,6 +289,9 @@ def add_pedido_view(request):
 
 @login_required
 def pedidos_view(request):
+    if request.user.rol not in ['Encargado de inventario', 'Gerente']:
+        return redirect('usuarios:logistics')
+
     tres_dias_atras = timezone.now() - timedelta(days=3)
     pedidos = Pedido.objects.filter(
         models.Q(estado='en_proceso') | 

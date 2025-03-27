@@ -7,4 +7,5 @@ app_name = 'contabilidad'
 
 urlpatterns = [
     path('', views.contabilidad_dashboard, name='contabilidad'),
+    path('descargar_movimientos/', views.descargar_movimientos, name='descargar_movimientos'),
 ]
