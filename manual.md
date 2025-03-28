@@ -4,7 +4,9 @@
 
 - [1. Introducción](#1-introducción)
   - [1.1. Propósito](#11-propósito)
+
 - [2. Requisitos del sistema](#2-requisitos-del-sistema)
+
 - [3. Inicio de sesión y roles de usuario](#3-inicio-de-sesión-y-roles-de-usuario)
   - [3.1. Acceso al sistema](#31-acceso-al-sistema)
     - [3.1.1. Registro de usuario](#311-registro-de-usuario)
@@ -14,6 +16,7 @@
     - [3.2.2. Gestionar usuarios desde el panel de administración](#322-gestionar-usuarios-desde-el-panel-de-administración)
   - [3.3. Roles de usuario](#33-roles-de-usuario)
   - [3.4. Cerrar sesión](#34-cerrar-sesión)
+
 - [4. Guía de uso](#4-guía-de-uso)
   - [4.1. Gestión de Inventario (Encargado de Inventario y Gerente)](#41-gestión-de-inventario-encargado-de-inventario-y-gerente)
     - [4.1.1. Ver el inventario](#411-ver-el-inventario)
@@ -30,10 +33,12 @@
     - [4.3.1. Acceder a la página de Gerente](#431-acceder-a-la-página-de-gerente)
     - [4.3.2. Descripción de la vista](#432-descripción-de-la-vista)
     - [4.3.3. Descargar informes](#433-descargar-informes)
+
 - [5. Preguntas frecuentes (FAQ)](#5-preguntas-frecuentes-faq)
   - [5.1. ¿Qué sucede con los datos antiguos?](#51-qué-sucede-con-los-datos-antiguos)
   - [5.2. ¿Puedo descargar informes de períodos más largos?](#52-puedo-descargar-informes-de-períodos-más-largos)
   - [5.3. ¿Qué hago si no puedo acceder a una sección?](#53-qué-hago-si-no-puedo-acceder-a-una-sección)
+  
 - [6. Solución de problemas](#6-solución-de-problemas)
   - [6.1. No puedo iniciar sesión](#61-no-puedo-iniciar-sesión)
   - [6.2. El dropdown no funciona](#62-el-dropdown-no-funciona)
@@ -97,7 +102,7 @@ Para crear usuarios con roles específicos (como Encargado de Inventario, Contab
    - Escribe "CMD" en el buscador de Windows y presiona Enter.
 2. Navega a la carpeta del proyecto donde se encuentra el archivo `manage.py`:
    - Usa el comando `cd` para moverte a la ruta del programa (por ejemplo, `cd C:\ruta\al\proyecto`).
-3. Ejecuta el siguiente comando para crear un superusuario:
+3. Ejecuta el siguiente comando para crear un superusuario: `python manage.py createsuperuser`
 4. Sigue las instrucciones en pantalla para asignar:
 - Correo electrónico
 - Nombre de usuario
