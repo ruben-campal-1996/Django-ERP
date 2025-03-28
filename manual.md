@@ -38,7 +38,7 @@
   - [5.1. ¿Qué sucede con los datos antiguos?](#51-qué-sucede-con-los-datos-antiguos)
   - [5.2. ¿Puedo descargar informes de períodos más largos?](#52-puedo-descargar-informes-de-períodos-más-largos)
   - [5.3. ¿Qué hago si no puedo acceder a una sección?](#53-qué-hago-si-no-puedo-acceder-a-una-sección)
-  
+
 - [6. Solución de problemas](#6-solución-de-problemas)
   - [6.1. No puedo iniciar sesión](#61-no-puedo-iniciar-sesión)
   - [6.2. El dropdown no funciona](#62-el-dropdown-no-funciona)
@@ -65,6 +65,7 @@ Para usar DjangoERP, necesitas:
 - Acceso a internet.
 - Credenciales de usuario proporcionadas por el administrador del sistema.
 - Permisos adecuados según tu rol (Encargado de Inventario, Contable o Gerente).
+- **PgAdmin 4** instalado para gestionar la base de datos PostgreSQL.
 
 ---
 
