@@ -1,0 +1,29 @@
+@startuml Diagrama_Estados_Pedido
+
+' Estados
+[*] --> En_Proceso : crear_pedido()
+state "En Proceso" as En_Proceso
+En_Proceso --> Finalizada : finalizar_pedido()
+Finalizada --> [*] : pedido completado
+
+' Notas para transiciones
+note right of En_Proceso
+  Creado por Empleado de Ventas o Encargado de Inventario
+  Añade detalles y actualiza stock
+end note
+
+note right of Finalizada
+  Pedido entregado o marcado como completo
+  Registra transacción si aplica
+end note
+
+' Estilización
+skinparam monochrome true
+skinparam state {
+  BackgroundColor LightGray
+  BorderColor Black
+  FontSize 12
+}
+skinparam arrowColor Black
+
+@enduml

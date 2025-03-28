@@ -1,0 +1,32 @@
+@startuml Diagrama_Componentes_ERP
+
+' Componentes
+[Usuarios] #..# "Gestiona usuarios y autenticación"
+[Inventario] #..# "Gestiona pedidos y stock"
+[Contabilidad] #..# "Gestiona finanzas"
+[Django Core] #..# "Framework base"
+
+' Interfaces (opcional, implícitas en dependencias)
+[Usuarios] --> (Autenticación)
+[Inventario] --> (Gestión de Pedidos)
+[Contabilidad] --> (Gestión Financiera)
+
+' Dependencias
+[Inventario] --> [Usuarios] : Usa modelo Usuario (cliente, usuario)
+[Contabilidad] --> [Inventario] : Usa modelo Pedido (transacciones)
+[Contabilidad] --> [Usuarios] : Autenticación indirecta
+[Usuarios] --> [Django Core] : Extiende AbstractUser
+[Inventario] --> [Django Core] : Usa ORM
+[Contabilidad] --> [Django Core] : Usa ORM
+
+' Estilización
+skinparam monochrome true
+skinparam component {
+  BackgroundColor LightGray
+  BorderColor Black
+  FontSize 12
+}
+skinparam noteBackgroundColor LightYellow
+skinparam noteBorderColor Black
+
+@enduml

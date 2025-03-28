@@ -1,0 +1,38 @@
+@startuml Secuencia_Gestion_Usuarios
+
+' Participantes
+actor "Administrador" as Admin
+participant "Sistema" as Sistema
+participant ":Usuario" as Usuario
+participant "CustomUserManager" as Manager
+
+' Flujo principal: Acceso a la vista
+Admin -> Sistema: acceder_vista_administracion()
+Sistema --> Admin: muestra lista de usuarios
+
+' Alternativas para cada acción
+alt Crear Usuario
+  Admin -> Sistema: crear_usuario(nombre, correo, telefono, rol, contraseña)
+  Sistema -> Manager: create_user(correo, contraseña, nombre, rol, telefono)
+  Manager -> Usuario: new(correo, nombre, rol, telefono)
+  Usuario --> Manager: usuario creado
+  Manager --> Sistema: usuario guardado
+  Sistema --> Admin: éxito
+else Editar Usuario
+  Admin -> Sistema: editar_usuario(id_usuario, nuevos_datos)
+  Sistema -> Usuario: actualizar(nombre, correo, telefono, rol)
+  Usuario --> Sistema: datos actualizados
+  Sistema --> Admin: éxito
+else Eliminar Usuario
+  Admin -> Sistema: eliminar_usuario(id_usuario)
+  Sistema -> Usuario: delete()
+  Usuario --> Sistema: usuario eliminado
+  Sistema --> Admin: éxito
+end
+
+' Estilización
+skinparam monochrome true
+skinparam responseMessageBelowArrow true
+skinparam defaultFontSize 10
+
+@enduml

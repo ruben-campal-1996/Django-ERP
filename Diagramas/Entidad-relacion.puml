@@ -1,0 +1,83 @@
+@startuml DER_ERP
+
+' Entidades
+entity "Usuario" {
+  *id_usuario : int <<PK>>
+  --
+  nombre : string
+  correo : string <<unique>>
+  telefono : string <<unique>> <<null>>
+  rol : string
+  username : string <<null>>
+}
+
+entity "Budget" {
+  *id : int <<PK>>
+  --
+  fecha_actualizacion : datetime
+  monto_inicial : decimal
+}
+
+entity "Transaccion" {
+  *id : int <<PK>>
+  --
+  tipo : string
+  monto : decimal
+  descripcion : text
+  fecha : datetime
+  budget_id : int <<FK>>
+  pedido_id : int <<FK>> <<null>>
+}
+
+entity "Producto" {
+  *id_producto : string <<PK>>
+  --
+  nombre : string
+  descripcion : text
+  precio : decimal
+  stock : int
+  imagen : string
+}
+
+entity "MovimientoStock" {
+  *id : int <<PK>>
+  --
+  tipo : string
+  cantidad : int
+  fecha : datetime
+  producto_id : string <<FK>>
+  usuario_id : int <<FK>> <<null>>
+}
+
+entity "Pedido" {
+  *id_pedido : int <<PK>>
+  --
+  fecha : datetime
+  estado : string
+  descripcion : text
+  cliente_id : int <<FK>> <<null>>
+}
+
+entity "DetallePedido" {
+  *id : int <<PK>>
+  --
+  cantidad : int
+  pedido_id : int <<FK>>
+  producto_id : string <<FK>>
+}
+
+' Relaciones
+Usuario ||--o{ MovimientoStock : realiza
+Usuario ||--o{ Pedido : es cliente
+Budget ||--o{ Transaccion : tiene
+Producto ||--o{ MovimientoStock : tiene
+Producto ||--o{ DetallePedido : se pide
+Pedido ||--o{ DetallePedido : contiene
+Pedido ||--o{ Transaccion : genera
+
+' Estilización
+skinparam monochrome true
+skinparam padding 2
+skinparam defaultFontSize 10
+
+@enduml

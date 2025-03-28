@@ -52,4 +52,4 @@ skinparam padding 2
 skinparam defaultFontSize 10
 skinparam packageStyle rectangle
 
-@enduml
+@endumlP
